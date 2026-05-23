@@ -44,11 +44,11 @@ class ScheduleHomePage extends StatelessWidget {
     )
   ],
 ),
-        bottomNavigationBar: BottomAppBar(
+      bottomNavigationBar: BottomAppBar(
           color: Colors.transparent,
           child: Container(height: 10)
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       );
   }
 
@@ -65,7 +65,6 @@ class ScheduleHomePage extends StatelessWidget {
       centerTitle: true,
       leading: GestureDetector(
         onTap: () {
-
         },
         child: Container (
         margin: EdgeInsets.all(10),
@@ -100,23 +99,7 @@ class ScheduleHomePage extends StatelessWidget {
   }
 }
 
-class AddSchedButton extends StatelessWidget {
-  const AddSchedButton({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {}),
-        bottomNavigationBar: BottomAppBar(
-          color: Colors.yellow,
-          child: Container(height: 50)
-          ),
-    );
-    return Scaffold();
-  }
-}
 
 
 
