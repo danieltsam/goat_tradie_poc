@@ -8,14 +8,13 @@ class ScheduleHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(),
-      floatingActionButton: floatingActionButton(),
 
-      bottomNavigationBar: const BottomAppBar(
-        color: Colors.transparent,
-        child: SizedBox(height: 10),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      //Header
+      appBar: appBar(),
+
+      //Footer
+      floatingActionButton: floatingActionButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
