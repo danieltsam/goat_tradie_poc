@@ -64,6 +64,11 @@ class ScheduleHomePage extends StatelessWidget {
 
       //Contains the legend and step count
       //the "bottom" property of the appBar wiget is a special little property that takes a PrefferedSize widget. the PS widget can be set to a custom height and we can put other things in it. these other things are also part of the header bc theyre in the appBar widget
+
+      //To Note:
+      //The fromHeight variable is responsible for adjusting the entire appBar height and will scale everything upwards to fit.
+      //The height variable is the position of the upper bound of the PrefferedSize widget, it will also scale the contents of the PS widget AND the appBar widget (the text and buttons)
+      //Its kinda funky but just mess with changing the numbers and see what happens
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(90.0),
         child: Container(
@@ -134,6 +139,7 @@ class ScheduleHomePage extends StatelessWidget {
     );
   }
 
+  //Contains the footers buttons.
   Widget floatingActionButton() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
