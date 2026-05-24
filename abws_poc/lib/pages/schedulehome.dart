@@ -1,6 +1,29 @@
 import 'package:flutter/material.dart';
+import '../scheduleWidgets/schedulewidgets.dart';
 
-final List<String> weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+void _showMyDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        titleTextStyle: TextStyle(fontFamily: 'Inter', color: Colors.black, ),
+        // contentTextStyle: TextStyle(fontFamily: 'Inter', color: Colors.black), Currently unused, same formatting as title
+        title: Text(('Add Personal Time'), textAlign: TextAlign.center),
+        // content: TimePickerDialog(initialTime: TimeOfDay.now()), Currently not working, too big I think
+        // TODO: Fix that and implement,
+        actionsAlignment: MainAxisAlignment.center,
+        actions: <Widget>[     
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Closes the dialog
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 
 class ScheduleHomePage extends StatelessWidget {
   const ScheduleHomePage({super.key});
@@ -10,9 +33,12 @@ class ScheduleHomePage extends StatelessWidget {
     return Scaffold(
       //Header
       appBar: appBar(),
-
+      
+      // body
+      body: const WeeklyScheduleBody(),
+        
       //Footer
-      floatingActionButton: floatingActionButton(),
+      floatingActionButton: floatingActionButton(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
@@ -140,7 +166,7 @@ class ScheduleHomePage extends StatelessWidget {
   }
 
   //Contains the footers buttons.
-  Widget floatingActionButton() {
+  Widget floatingActionButton(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -156,7 +182,9 @@ class ScheduleHomePage extends StatelessWidget {
         const SizedBox(width: 10),
         FloatingActionButton(
           heroTag: "btn2",
-          onPressed: () {},
+          onPressed: (){
+          _showMyDialog(context);
+          },
           foregroundColor: Colors.black,
           backgroundColor: Colors.red,
           shape: const CircleBorder(),
@@ -175,4 +203,6 @@ class ScheduleHomePage extends StatelessWidget {
       ],
     );
   }
+
 }
+
