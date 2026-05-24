@@ -11,7 +11,7 @@ class ScheduleHomePage extends StatelessWidget {
         style: TextStyle(
           color: Colors.black,
           fontSize: 18,
-          fontWeight: FontWeight.bold
+          fontWeight: FontWeight.normal
         )
         ),
         backgroundColor: Colors.red,
