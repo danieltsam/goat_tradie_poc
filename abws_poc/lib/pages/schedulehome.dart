@@ -69,6 +69,9 @@ class ScheduleHomePage extends StatelessWidget {
         FloatingActionButton(
           heroTag: "btn1",
           onPressed: () {},
+          foregroundColor: Colors.black,
+          backgroundColor: Colors.red,
+          shape: const CircleBorder(),
           child: const Icon(Icons.help),
         ),
 
@@ -76,6 +79,9 @@ class ScheduleHomePage extends StatelessWidget {
         FloatingActionButton(
           heroTag: "btn2",
           onPressed: () {},
+          foregroundColor: Colors.black,
+          backgroundColor: Colors.red,
+          shape: const CircleBorder(),
           child: const Icon(Icons.add),
         ),
         
@@ -83,6 +89,9 @@ class ScheduleHomePage extends StatelessWidget {
         FloatingActionButton(
           heroTag: "btn3",
           onPressed: () {},
+          foregroundColor: Colors.black,
+          backgroundColor: Colors.red,
+          shape: const CircleBorder(),
           child: const Icon(Icons.arrow_right),
         ),
       ],
