@@ -43,6 +43,9 @@ class ScheduleHomePage extends StatelessWidget {
           ),
         ),
       ),
+
+      //Comtains the GOAT profile button
+      //the "actions" section is a special property of the appBar widget for things like your profile icon or notifications icon
       actions: [
         Container(
           margin: const EdgeInsets.all(10),
@@ -59,6 +62,24 @@ class ScheduleHomePage extends StatelessWidget {
           ),
         ),
       ],
+
+      //Contains the legend and step count
+      //the "bottom" property of the appBar wiget is a special little property that takes a PrefferedSize widget. the PS widget can be set to a custom height and we can put other things in it. these other things are also part of the header bc theyre in the appBar widget
+      bottom: PreferredSize(
+        // Adjust this height based on how much content you need to fit
+        preferredSize: const Size.fromHeight(100.0), 
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16.0),
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Extra Header Information Here', style: TextStyle(color: Colors.white, fontSize: 16)),
+              // Add your extra information widgets here!
+            ],
+          ),
+        ),
+      ),
     );
   }
 
