@@ -8,7 +8,6 @@ class ScheduleHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       //Header
       appBar: appBar(),
 
@@ -66,16 +65,68 @@ class ScheduleHomePage extends StatelessWidget {
       //Contains the legend and step count
       //the "bottom" property of the appBar wiget is a special little property that takes a PrefferedSize widget. the PS widget can be set to a custom height and we can put other things in it. these other things are also part of the header bc theyre in the appBar widget
       bottom: PreferredSize(
-        // Adjust this height based on how much content you need to fit
-        preferredSize: const Size.fromHeight(100.0), 
+        preferredSize: const Size.fromHeight(90.0),
         child: Container(
+          height: 90.0,
           width: double.infinity,
-          padding: const EdgeInsets.all(16.0),
-          child: const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+
+          child: Row(
             children: [
-              Text('Extra Header Information Here', style: TextStyle(color: Colors.white, fontSize: 16)),
-              // Add your extra information widgets here!
+              //The step count square
+              AspectRatio(
+                aspectRatio: 1.0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+              ),
+
+              //A box for padding
+              const SizedBox(
+                width: 15,
+              ), // Add a little gap between the square and the text
+
+              //The progress bar and legend
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+
+                    //The progress bar
+                    Expanded(
+                      flex: 3,
+                      child: Container(
+                        //color: Colors.blue, // Placeholder for top box
+                        padding: const EdgeInsets.all(5.0), // Creates the inset space
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          width: double.infinity, // Spans the full inset width
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    //The legend
+                    Expanded(
+                      flex: 4,
+                      child: Container(
+                        color: Colors.green, // Placeholder for bottom box
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'legend box',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -105,7 +156,7 @@ class ScheduleHomePage extends StatelessWidget {
           shape: const CircleBorder(),
           child: const Icon(Icons.add),
         ),
-        
+
         const SizedBox(width: 10),
         FloatingActionButton(
           heroTag: "btn3",
