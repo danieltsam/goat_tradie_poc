@@ -9,30 +9,7 @@ class ScheduleHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          FloatingActionButton(
-            heroTag: "btn1",
-            onPressed: () {},
-            child: const Icon(Icons.help),
-          ),
-
-          const SizedBox(width: 10),
-          FloatingActionButton(
-            heroTag: "btn2",
-            onPressed: () {},
-            child: const Icon(Icons.add),
-          ),
-
-          const SizedBox(width: 10),
-          FloatingActionButton(
-            heroTag: "btn3",
-            onPressed: () {},
-            child: const Icon(Icons.arrow_right),
-          ),
-        ],
-      ),
+      floatingActionButton: floatingActionButton(),
 
       bottomNavigationBar: const BottomAppBar(
         color: Colors.transparent,
@@ -81,6 +58,33 @@ class ScheduleHomePage extends StatelessWidget {
             height: 20,
             width: 20,
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget floatingActionButton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        FloatingActionButton(
+          heroTag: "btn1",
+          onPressed: () {},
+          child: const Icon(Icons.help),
+        ),
+
+        const SizedBox(width: 10),
+        FloatingActionButton(
+          heroTag: "btn2",
+          onPressed: () {},
+          child: const Icon(Icons.add),
+        ),
+        
+        const SizedBox(width: 10),
+        FloatingActionButton(
+          heroTag: "btn3",
+          onPressed: () {},
+          child: const Icon(Icons.arrow_right),
         ),
       ],
     );
