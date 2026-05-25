@@ -1,26 +1,84 @@
 import 'package:flutter/material.dart';
 import '../scheduleWidgets/schedulewidgets.dart';
 
-void _showMyDialog(BuildContext context) {
-  showDialog(
+
+Future<void> _showAddSchedule(BuildContext context)  async{
+  TimeOfDay startTime = TimeOfDay.now();
+  TimeOfDay endTime = TimeOfDay.now();
+  String? selectedDay = 'Monday';
+
+  await showDialog(
     context: context,
     builder: (BuildContext context) {
-      return AlertDialog(
-        titleTextStyle: TextStyle(fontFamily: 'Inter', color: Colors.black, ),
-        // contentTextStyle: TextStyle(fontFamily: 'Inter', color: Colors.black), Currently unused, same formatting as title
+      return StatefulBuilder(builder: (context, setState) {
+      
+      return AlertDialog( 
         title: Text(('Add Personal Time'), textAlign: TextAlign.center),
-        // content: TimePickerDialog(initialTime: TimeOfDay.now()), Currently not working, too big I think
-        // TODO: Fix that and implement,
-        actionsAlignment: MainAxisAlignment.center,
-        actions: <Widget>[     
-          TextButton(
-            child: const Text('Close'),
-            onPressed: () {
-              Navigator.of(context).pop(); // Closes the dialog
-            },
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+          ListTile(
+            title: Text("Start Time: ${startTime.format(context)}"),
+            trailing: const Icon(Icons.access_time),
+            onTap: () async{
+              final picked = await showTimePicker(
+                context: context,
+              initialTime: startTime,);
+              if (picked != null) setState(() => startTime = picked);
+            }
           ),
-        ],
+           ListTile(
+            title: Text("End Time: ${endTime.format(context)}"),
+            trailing: const Icon(Icons.access_time),
+            onTap: () async{
+              final picked = await showTimePicker(
+                context: context,
+              initialTime: endTime,);
+              if (picked != null) setState(() => endTime = picked);
+            }
+          ),
+          const SizedBox(height: 20),
+
+          DropdownButton<String>(
+                  value: selectedDay,
+                  isExpanded: true,
+                  items: <String>['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                      .map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {
+                    setState(() => selectedDay = newValue);
+                  },
+                ),
+              ],
+            ),
+            actions: 
+              [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // No functionality currently
+                  Navigator.pop(context);
+                },
+                child: const Text('Save'),
+              ),
+            ],
+            
+
+
+
+        
+        // TODO: Fix that and implement,
+
       );
+    }
+    );
     },
   );
 }
@@ -47,7 +105,7 @@ class ScheduleHomePage extends StatelessWidget {
     return AppBar(
       title: const Text(
         'A Better Weekly Structure',
-        style: TextStyle(color: Colors.black, fontSize: 18),
+        style: TextStyle(color: Colors.black, fontSize: 18, fontFamily: 'HighVoltage'),
       ),
       backgroundColor: Colors.red,
       elevation: 0.0,
@@ -183,7 +241,7 @@ class ScheduleHomePage extends StatelessWidget {
         FloatingActionButton(
           heroTag: "btn2",
           onPressed: (){
-          _showMyDialog(context);
+          _showAddSchedule(context);
           },
           foregroundColor: Colors.black,
           backgroundColor: Colors.red,
@@ -204,5 +262,9 @@ class ScheduleHomePage extends StatelessWidget {
     );
   }
 
+
+
 }
+
+
 
