@@ -1,17 +1,10 @@
+import 'package:abws_poc/schedule_data.dart';
 import 'package:flutter/material.dart';
 
 class WeeklyScheduleBody extends StatelessWidget {
-  const WeeklyScheduleBody({super.key}); // The key is meant for preserving state, which will be important when we start to add stuff to the schedule 
+  const WeeklyScheduleBody({super.key, required this.events});
 
-  static const List<String> days = [
-    'Mon',
-    'Tues',
-    'Wed',
-    'Thur',
-    'Fri',
-    'Sat',
-    'Sun',
-  ];
+  final List<ScheduleEvent> events;
 
   @override
   Widget build(BuildContext context) {
@@ -19,17 +12,18 @@ class WeeklyScheduleBody extends StatelessWidget {
       child: Container(
         color: Colors.white,
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          // Repeating 7 times, I know we'll probs want to change this code for the full, but Miles did mention wanting to view less days at a time for mobile
-          children: List.generate(
-            days.length,
-            (index) => Expanded(
-              child: _DayColumn(
-                day: days[index],
-                isLast: index == days.length - 1,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < weekDayLabels.length; i++)
+              Expanded(
+                child: _DayColumn(
+                  dayIndex: i,
+                  label: weekDayLabels[i],
+                  isLast: i == weekDayLabels.length - 1,
+                  events: events.where((e) => e.dayIndex == i).toList(),
+                ),
               ),
-            ),
-          ),
+          ],
         ),
       ),
     );
@@ -37,25 +31,24 @@ class WeeklyScheduleBody extends StatelessWidget {
 }
 
 class _DayColumn extends StatelessWidget {
-  final String day;
-  final bool isLast;
-
   const _DayColumn({
-    required this.day,
+    required this.dayIndex,
+    required this.label,
     required this.isLast,
+    required this.events,
   });
 
+  final int dayIndex;
+  final String label;
+  final bool isLast;
+  final List<ScheduleEvent> events;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Day label
         Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 3,
-            vertical: 8,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
           child: Container(
             height: 32,
             alignment: Alignment.center,
@@ -63,33 +56,55 @@ class _DayColumn extends StatelessWidget {
               color: Colors.grey,
               borderRadius: BorderRadius.circular(6),
             ),
-            child: Text(
-              day,
-              style: const TextStyle(
-                fontSize: 16,
-                fontFamily: 'Inter',
-                
-              ),
-            ),
+            child: Text(label, style: const TextStyle(fontSize: 14, fontFamily: 'Inter')),
           ),
         ),
-
-        // Schedule column
         Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border(
-                right: isLast
-                    ? BorderSide.none
-                    : BorderSide(
-                        color: Colors.black.withValues(alpha: 0.5),
-                        width: 1,
-                      ),
-              ),
-            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final h = constraints.maxHeight;
+              return Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: isLast
+                        ? BorderSide.none
+                        : BorderSide(color: Colors.black.withValues(alpha: 0.5)),
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    for (final event in events) _eventBlock(context, event, h),
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ],
+    );
+  }
+
+  Widget _eventBlock(BuildContext context, ScheduleEvent event, double columnHeight) {
+    final top = scheduleFraction(event.startTime) * columnHeight;
+    final height =
+        (scheduleFraction(event.endTime) - scheduleFraction(event.startTime)) * columnHeight;
+    final color = categoryById(event.categoryId).color.withValues(alpha: 0.9);
+
+    return Positioned(
+      top: top,
+      left: 2,
+      right: 2,
+      height: height.clamp(28, columnHeight - top),
+      child: DecoratedBox(
+        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(4)),
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Text(
+            event.blockLabel(context),
+            style: const TextStyle(fontSize: 9, height: 1.1, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -1,158 +1,143 @@
+import 'package:abws_poc/add_event_sheet.dart';
+import 'package:abws_poc/schedule_data.dart';
+import 'package:abws_poc/scheduleWidgets/category_legend.dart';
+import 'package:abws_poc/scheduleWidgets/schedulewidgets.dart';
 import 'package:flutter/material.dart';
-import '../scheduleWidgets/schedulewidgets.dart';
 
-void _showMyDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        titleTextStyle: TextStyle(fontFamily: 'Inter', color: Colors.black, ),
-        // contentTextStyle: TextStyle(fontFamily: 'Inter', color: Colors.black), Currently unused, same formatting as title
-        title: Text(('Add Personal Time'), textAlign: TextAlign.center),
-        // content: TimePickerDialog(initialTime: TimeOfDay.now()), Currently not working, too big I think
-        // TODO: Fix that and implement,
-        actionsAlignment: MainAxisAlignment.center,
-        actions: <Widget>[     
-          TextButton(
-            child: const Text('Close'),
-            onPressed: () {
-              Navigator.of(context).pop(); // Closes the dialog
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
-class ScheduleHomePage extends StatelessWidget {
+class ScheduleHomePage extends StatefulWidget {
   const ScheduleHomePage({super.key});
 
   @override
+  State<ScheduleHomePage> createState() => _ScheduleHomePageState();
+}
+
+class _ScheduleHomePageState extends State<ScheduleHomePage> {
+  late List<ScheduleEvent> _events;
+
+  @override
+  void initState() {
+    super.initState();
+    _events = [
+      buildEvent(
+        categoryId: 'family',
+        title: 'Family Time',
+        dayIndex: 0,
+        startTime: const TimeOfDay(hour: 7, minute: 0),
+        endTime: const TimeOfDay(hour: 18, minute: 0),
+      ),
+      buildEvent(
+        categoryId: 'personal',
+        title: 'Personal Time',
+        dayIndex: 2,
+        startTime: const TimeOfDay(hour: 17, minute: 0),
+        endTime: const TimeOfDay(hour: 22, minute: 0),
+      ),
+      buildEvent(
+        categoryId: 'work_admin',
+        title: 'Work Admin',
+        dayIndex: 6,
+        startTime: const TimeOfDay(hour: 8, minute: 0),
+        endTime: const TimeOfDay(hour: 12, minute: 0),
+      ),
+      buildEvent(
+        categoryId: 'family',
+        title: 'Family Time',
+        dayIndex: 6,
+        startTime: const TimeOfDay(hour: 12, minute: 0),
+        endTime: const TimeOfDay(hour: 18, minute: 0),
+      ),
+    ];
+  }
+
+  void _addEvent(ScheduleEvent event) => setState(() => _events.add(event));
+
+  void _openAddSheet() {
+    showAddEventSheet(context, category: activeStepCategory, onSaved: _addEvent);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final stepNumber = guidedCurrentStepIndex + 1;
+    final stepProgress = stepNumber / guidedTotalSteps;
+
     return Scaffold(
-      //Header
-      appBar: appBar(),
-      
-      // body
-      body: const WeeklyScheduleBody(),
-        
-      //Footer
-      floatingActionButton: floatingActionButton(context),
+      drawer: const ScheduleSidebar(),
+      appBar: _appBar(stepNumber, stepProgress),
+      body: Column(
+        children: [
+          WeeklyScheduleBody(events: _events),
+        ],
+      ),
+      floatingActionButton: _footerButtons(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
-  AppBar appBar() {
+  AppBar _appBar(int stepNumber, double stepProgress) {
     return AppBar(
       title: const Text(
-        'A Better Weekly Structure',
+        'A Better Weekly Schedule',
         style: TextStyle(color: Colors.black, fontSize: 18),
       ),
       backgroundColor: Colors.red,
-      elevation: 0.0,
+      elevation: 0,
       centerTitle: true,
-      leading: GestureDetector(
-        onTap: () {},
-        child: Container(
-          margin: const EdgeInsets.all(10),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Image.asset(
-            'assets/icons/back_arrow.png',
-            height: 20,
-            width: 20,
-          ),
-        ),
+      leading: IconButton(
+        onPressed: () {},
+        icon: Image.asset('assets/icons/back_arrow.png', height: 20, width: 20),
       ),
-
-      //Comtains the GOAT profile button
-      //the "actions" section is a special property of the appBar widget for things like your profile icon or notifications icon
       actions: [
-        Container(
-          margin: const EdgeInsets.all(10),
-          alignment: Alignment.center,
-          width: 37,
-          decoration: BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Image.asset(
-            'assets/icons/goat_temp.png',
-            height: 20,
-            width: 20,
-          ),
+        IconButton(
+          icon: const Icon(Icons.menu, color: Colors.black),
+          onPressed: () => Scaffold.of(context).openDrawer(),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 10),
+          child: Image.asset('assets/icons/goat_temp.png', height: 28, width: 28),
         ),
       ],
-
-      //Contains the legend and step count
-      //the "bottom" property of the appBar wiget is a special little property that takes a PrefferedSize widget. the PS widget can be set to a custom height and we can put other things in it. these other things are also part of the header bc theyre in the appBar widget
-
-      //To Note:
-      //The fromHeight variable is responsible for adjusting the entire appBar height and will scale everything upwards to fit.
-      //The height variable is the position of the upper bound of the PrefferedSize widget, it will also scale the contents of the PS widget AND the appBar widget (the text and buttons)
-      //Its kinda funky but just mess with changing the numbers and see what happens
       bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(90.0),
+        preferredSize: const Size.fromHeight(96),
         child: Container(
-          height: 90.0,
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-
+          height: 96,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           child: Row(
             children: [
-              //The step count square
               AspectRatio(
-                aspectRatio: 1.0,
+                aspectRatio: 1,
                 child: Container(
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '$stepNumber',
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
-
-              //A box for padding
-              const SizedBox(
-                width: 15,
-              ), // Add a little gap between the square and the text
-
-              //The progress bar and legend
+              const SizedBox(width: 15),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-
-                    //The progress bar
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                        //color: Colors.blue, // Placeholder for top box
-                        padding: const EdgeInsets.all(5.0), // Creates the inset space
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          width: double.infinity, // Spans the full inset width
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                        ),
+                    Text('Step $stepNumber of $guidedTotalSteps', style: const TextStyle(fontSize: 10)),
+                    const SizedBox(height: 2),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: stepProgress,
+                        minHeight: 6,
+                        backgroundColor: Colors.white,
+                        color: activeStepCategory.color,
                       ),
                     ),
-                    
-                    //The legend
-                    Expanded(
-                      flex: 4,
-                      child: Container(
-                        color: Colors.green, // Placeholder for bottom box
-                        alignment: Alignment.center,
-                        child: const Text(
-                          'legend box',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                    const SizedBox(height: 4),
+                    const Expanded(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: CategoryLegend(compact: true),
                       ),
                     ),
                   ],
@@ -165,44 +150,32 @@ class ScheduleHomePage extends StatelessWidget {
     );
   }
 
-  //Contains the footers buttons.
-  Widget floatingActionButton(BuildContext context) {
+  Widget _footerButtons(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         FloatingActionButton(
-          heroTag: "btn1",
-          onPressed: () {},
+          heroTag: 'help',
+          onPressed: () => Scaffold.of(context).openDrawer(),
           foregroundColor: Colors.black,
           backgroundColor: Colors.red,
-          shape: const CircleBorder(),
           child: const Icon(Icons.help),
         ),
-
-        const SizedBox(width: 10),
         FloatingActionButton(
-          heroTag: "btn2",
-          onPressed: (){
-          _showMyDialog(context);
-          },
+          heroTag: 'add',
+          onPressed: _openAddSheet,
           foregroundColor: Colors.black,
           backgroundColor: Colors.red,
-          shape: const CircleBorder(),
           child: const Icon(Icons.add),
         ),
-
-        const SizedBox(width: 10),
         FloatingActionButton(
-          heroTag: "btn3",
+          heroTag: 'next',
           onPressed: () {},
           foregroundColor: Colors.black,
           backgroundColor: Colors.red,
-          shape: const CircleBorder(),
-          child: const Icon(Icons.arrow_right),
+          child: const Icon(Icons.arrow_forward),
         ),
       ],
     );
   }
-
 }
-
