@@ -1,17 +1,24 @@
-# abws_poc
+# ABWS — A Better Weekly Structure
 
-A new Flutter project.
+Tablet-first weekly planner POC (G.O.A.T Tradie).
 
-## Getting Started
+## Run
 
-This project is a starting point for a Flutter application.
+```bash
+flutter run -d chrome
+```
 
-A few resources to get you started if this is your first Flutter project:
+Wide window (≥600px) = tablet (sidebar + grid). Narrow = phone (+ button opens add dialog).
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Code map (4 files)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+| File | Role |
+|------|------|
+| `lib/schedule_data.dart` | Categories, events, grid times, validation, progress bar math |
+| `lib/schedule_home_page.dart` | Screen layout, header bar, tablet sidebar |
+| `lib/add_event_form.dart` | Shared add-event form |
+| `lib/week_grid_view.dart` | 7-day calendar grid |
+
+## Review branch
+
+Work targets `tablet-calendar` until merged to `main`.

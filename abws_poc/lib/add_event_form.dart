@@ -1,10 +1,7 @@
-import 'package:abws_poc/models/schedule_event.dart';
-import 'package:abws_poc/schedule/schedule_constants.dart';
-import 'package:abws_poc/schedule/schedule_event_builder.dart';
-import 'package:abws_poc/widgets/time_picker_button.dart';
+import 'package:abws_poc/schedule_data.dart';
 import 'package:flutter/material.dart';
 
-/// Shared form for adding events — used on tablet (sidebar) and phone (dialog).
+/// Add-event form used in the tablet sidebar and phone dialog.
 class AddEventForm extends StatefulWidget {
   const AddEventForm({
     super.key,
@@ -30,7 +27,7 @@ class _AddEventFormState extends State<AddEventForm> {
   int? _dayIndex;
   TimeOfDay _startTime = const TimeOfDay(hour: 6, minute: 30);
   TimeOfDay _endTime = const TimeOfDay(hour: 7, minute: 30);
-  String? _errorMessage;
+  String? _error;
 
   @override
   void dispose() {
@@ -38,27 +35,46 @@ class _AddEventFormState extends State<AddEventForm> {
     super.dispose();
   }
 
+  Future<void> _pickTime(bool isStart) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: isStart ? _startTime : _endTime,
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: ColorScheme.light(primary: Colors.red.shade700),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked == null) return;
+    setState(() {
+      if (isStart) {
+        _startTime = picked;
+      } else {
+        _endTime = picked;
+      }
+      _error = null;
+    });
+  }
+
   void _submit() {
-    final title = widget.showTitleField
-        ? _titleController.text.trim()
-        : widget.categoryName;
+    final title =
+        widget.showTitleField ? _titleController.text.trim() : widget.categoryName;
     if (title.isEmpty) {
-      setState(() => _errorMessage = 'Please enter a title.');
+      setState(() => _error = 'Please enter a title.');
       return;
     }
-
-    final error = validateScheduleEventInput(
+    final validation = validateEventInput(
       dayIndex: _dayIndex,
       startTime: _startTime,
       endTime: _endTime,
     );
-    if (error != null) {
-      setState(() => _errorMessage = error);
+    if (validation != null) {
+      setState(() => _error = validation);
       return;
     }
-
     widget.onEventAdded(
-      buildScheduleEvent(
+      buildEvent(
         title: title,
         categoryId: widget.categoryId,
         dayIndex: _dayIndex!,
@@ -66,12 +82,12 @@ class _AddEventFormState extends State<AddEventForm> {
         endTime: _endTime,
       ),
     );
-    setState(() => _errorMessage = null);
+    setState(() => _error = null);
   }
 
   @override
   Widget build(BuildContext context) {
-    const labelStyle = TextStyle(fontFamily: 'Inter', color: Colors.black87);
+    const label = TextStyle(fontFamily: 'Inter', color: Colors.black87);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -80,32 +96,17 @@ class _AddEventFormState extends State<AddEventForm> {
         if (widget.showTitleField) ...[
           TextField(
             controller: _titleController,
-            style: labelStyle,
             decoration: const InputDecoration(
               labelText: 'Title',
-              labelStyle: labelStyle,
+              labelStyle: label,
               border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
         ],
-        TimePickerButton(
-          label: 'Start',
-          time: _startTime,
-          onTimeChanged: (t) => setState(() {
-            _startTime = t;
-            _errorMessage = null;
-          }),
-        ),
+        _TimeRow(label: 'Start', time: _startTime, onTap: () => _pickTime(true)),
         const SizedBox(height: 8),
-        TimePickerButton(
-          label: 'End',
-          time: _endTime,
-          onTimeChanged: (t) => setState(() {
-            _endTime = t;
-            _errorMessage = null;
-          }),
-        ),
+        _TimeRow(label: 'End', time: _endTime, onTap: () => _pickTime(false)),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -121,27 +122,17 @@ class _AddEventFormState extends State<AddEventForm> {
             underline: const SizedBox.shrink(),
             items: List.generate(
               weekDayLabels.length,
-              (i) => DropdownMenuItem(
-                value: i,
-                child: Text(weekDayLabels[i], style: labelStyle),
-              ),
+              (i) => DropdownMenuItem(value: i, child: Text(weekDayLabels[i], style: label)),
             ),
             onChanged: (v) => setState(() {
               _dayIndex = v;
-              _errorMessage = null;
+              _error = null;
             }),
           ),
         ),
-        if (_errorMessage != null) ...[
+        if (_error != null) ...[
           const SizedBox(height: 8),
-          Text(
-            _errorMessage!,
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 12,
-              color: Colors.red.shade700,
-            ),
-          ),
+          Text(_error!, style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: Colors.red.shade700)),
         ],
         const SizedBox(height: 12),
         FilledButton(
@@ -152,12 +143,38 @@ class _AddEventFormState extends State<AddEventForm> {
             padding: const EdgeInsets.symmetric(vertical: 14),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
           ),
-          child: Text(
-            widget.submitLabel,
-            style: const TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600),
-          ),
+          child: Text(widget.submitLabel, style: const TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600)),
         ),
       ],
+    );
+  }
+}
+
+class _TimeRow extends StatelessWidget {
+  const _TimeRow({required this.label, required this.time, required this.onTap});
+
+  final String label;
+  final TimeOfDay time;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      onPressed: onTap,
+      style: OutlinedButton.styleFrom(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        backgroundColor: Colors.white,
+      ),
+      child: Row(
+        children: [
+          Text(label, style: const TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600)),
+          const Spacer(),
+          Text(time.format(context), style: const TextStyle(fontFamily: 'Inter')),
+          const SizedBox(width: 4),
+          const Icon(Icons.schedule, size: 18, color: Colors.black54),
+        ],
+      ),
     );
   }
 }
