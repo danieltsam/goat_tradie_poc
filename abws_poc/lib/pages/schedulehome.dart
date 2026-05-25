@@ -58,13 +58,13 @@ class _ScheduleHomePageState extends State<ScheduleHomePage> {
   @override
   Widget build(BuildContext context) {
     final stepNumber = guidedCurrentStepIndex + 1;
-    final stepProgress = stepNumber / guidedTotalSteps;
 
     return Scaffold(
       drawer: const ScheduleSidebar(),
-      appBar: _appBar(stepNumber, stepProgress),
+      appBar: _appBar(stepNumber),
       body: Column(
         children: [
+          _statusAndLegend(stepNumber),
           WeeklyScheduleBody(events: _events),
         ],
       ),
@@ -73,13 +73,14 @@ class _ScheduleHomePageState extends State<ScheduleHomePage> {
     );
   }
 
-  AppBar _appBar(int stepNumber, double stepProgress) {
+  AppBar _appBar(int stepNumber) {
     return AppBar(
       title: const Text(
         'A Better Weekly Schedule',
         style: TextStyle(color: Colors.black, fontSize: 18),
       ),
       backgroundColor: Colors.red,
+      surfaceTintColor: Colors.transparent,
       elevation: 0,
       centerTitle: true,
       leading: IconButton(
@@ -97,54 +98,46 @@ class _ScheduleHomePageState extends State<ScheduleHomePage> {
         ),
       ],
       bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(96),
-        child: Container(
-          height: 96,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        preferredSize: const Size.fromHeight(56),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
           child: Row(
             children: [
-              AspectRatio(
-                aspectRatio: 1,
-                child: Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '$stepNumber',
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
+              Container(
+                width: 44,
+                height: 44,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ),
-              const SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text('Step $stepNumber of $guidedTotalSteps', style: const TextStyle(fontSize: 10)),
-                    const SizedBox(height: 2),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: stepProgress,
-                        minHeight: 6,
-                        backgroundColor: Colors.white,
-                        color: activeStepCategory.color,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Expanded(
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: CategoryLegend(compact: true),
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  '$stepNumber',
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// White panel below the red app bar — avoids AppBar tint washing out legend colours.
+  Widget _statusAndLegend(int stepNumber) {
+    return Material(
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('Step $stepNumber of $guidedTotalSteps', style: const TextStyle(fontSize: 12)),
+            const SizedBox(height: 6),
+            CategoryProgressBar(events: _events),
+            const SizedBox(height: 10),
+            const CategoryLegend(compact: true),
+          ],
         ),
       ),
     );

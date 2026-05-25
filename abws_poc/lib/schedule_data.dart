@@ -8,15 +8,21 @@ const int guidedTotalSteps = 5;
 const int guidedCurrentStepIndex = 2; // "Step 3" in the UI
 
 class ScheduleCategory {
-  const ScheduleCategory({required this.id, required this.name, required this.color});
+  const ScheduleCategory({
+    required this.id,
+    required this.name,
+    required this.color,
+    this.recommendedHours = 2,
+  });
   final String id;
   final String name;
   final Color color;
+  final int recommendedHours;
 }
 
 const List<ScheduleCategory> scheduleCategories = [
   ScheduleCategory(id: 'on_tools', name: 'On The Tools', color: Color(0xFFE53935)),
-  ScheduleCategory(id: 'family', name: 'Family Time', color: Color(0xFF81C784)),
+  ScheduleCategory(id: 'family', name: 'Family Time', color: Color(0xFF81C784), recommendedHours: 3),
   ScheduleCategory(id: 'work_admin', name: 'Work Admin', color: Color(0xFF4FC3F7)),
   ScheduleCategory(id: 'personal', name: 'Personal Time', color: Color(0xFFFFEB3B)),
   ScheduleCategory(id: 'life_admin', name: 'Life Admin', color: Color(0xFFBA68C8)),
@@ -49,6 +55,12 @@ class ScheduleEvent {
   final TimeOfDay startTime;
   final TimeOfDay endTime;
 
+  int get durationMinutes {
+    final start = startTime.hour * 60 + startTime.minute;
+    final end = endTime.hour * 60 + endTime.minute;
+    return end - start;
+  }
+
   String blockLabel(BuildContext context) {
     final start = startTime.format(context).replaceAll(' ', '');
     final end = endTime.format(context).replaceAll(' ', '');
@@ -76,6 +88,26 @@ ScheduleEvent buildEvent({
     startTime: startTime,
     endTime: endTime,
   );
+}
+
+double hoursForCategory(List<ScheduleEvent> events, String categoryId) {
+  return events
+      .where((e) => e.categoryId == categoryId)
+      .fold<double>(0, (sum, e) => sum + e.durationMinutes / 60);
+}
+
+/// One segment per category: slot width = recommended hours, fill = hours booked.
+List<({ScheduleCategory category, int flex, double fill})> categoryProgressSlots(
+  List<ScheduleEvent> events,
+) {
+  return [
+    for (final category in scheduleCategories)
+      (
+        category: category,
+        flex: category.recommendedHours,
+        fill: (hoursForCategory(events, category.id) / category.recommendedHours).clamp(0.0, 1.0),
+      ),
+  ];
 }
 
 String? validateEvent({required int? dayIndex, required TimeOfDay start, required TimeOfDay end}) {
