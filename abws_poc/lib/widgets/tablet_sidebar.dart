@@ -1,4 +1,5 @@
 import 'package:abws_poc/models/schedule_event.dart';
+import 'package:abws_poc/schedule/category_hours.dart';
 import 'package:abws_poc/schedule/schedule_categories.dart';
 import 'package:abws_poc/schedule/guided_steps.dart';
 import 'package:abws_poc/schedule/schedule_constants.dart';
@@ -72,8 +73,8 @@ class TabletSidebar extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               recommended != null
-                  ? "Fill '${active.name}' time | Recommended: $recommended hours | Current: ${currentHours.toStringAsFixed(0)} hours"
-                  : "Fill '${active.name}' time | Current: ${currentHours.toStringAsFixed(0)} hours",
+                  ? "Fill '${active.name}' time | Recommended: $recommended hours | Current: ${formatCategoryHours(currentHours)} hours"
+                  : "Fill '${active.name}' time | Current: ${formatCategoryHours(currentHours)} hours",
               style: const TextStyle(fontFamily: 'Inter', fontSize: 11),
             ),
             const SizedBox(height: 14),
@@ -114,7 +115,7 @@ class CategoryHoursList extends StatelessWidget {
                     text: cat.name,
                     style: TextStyle(color: cat.color, fontWeight: FontWeight.w600),
                   ),
-                  TextSpan(text: ' ${hours.toStringAsFixed(0)} hours'),
+                  TextSpan(text: ' ${formatCategoryHours(hours)} hours'),
                 ],
               ),
             ),

@@ -1,9 +1,10 @@
 import 'package:abws_poc/models/schedule_event.dart';
 import 'package:abws_poc/schedule/category_hours.dart';
 import 'package:abws_poc/schedule/guided_steps.dart';
+import 'package:abws_poc/schedule/schedule_categories.dart';
 import 'package:flutter/material.dart';
 
-/// Red header strip: step badge, coloured progress bar, and compact legend.
+/// Red header strip: step badge, coloured progress bar, colour key (no duplicate text).
 class ScheduleHeaderProgress extends StatelessWidget {
   const ScheduleHeaderProgress({
     super.key,
@@ -15,7 +16,6 @@ class ScheduleHeaderProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final slots = categoryProgressSlots(events);
-    final booked = categoryHourSegments(events);
 
     return Container(
       height: 90,
@@ -57,7 +57,10 @@ class ScheduleHeaderProgress extends StatelessWidget {
                 ),
                 Expanded(
                   flex: 4,
-                  child: _CategoryLegend(slots: booked),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: _ColorKeyStrip(),
+                  ),
                 ),
               ],
             ),
@@ -68,7 +71,7 @@ class ScheduleHeaderProgress extends StatelessWidget {
   }
 }
 
-/// Bar divided by recommended hours; colour fills only the booked portion of each slot.
+/// Bar width = recommended hours per category; fill = scheduled ÷ recommended.
 class _ColoredProgressBar extends StatelessWidget {
   const _ColoredProgressBar({required this.slots});
 
@@ -88,20 +91,12 @@ class _ColoredProgressBar extends StatelessWidget {
           for (final slot in slots)
             Expanded(
               flex: slot.recommendedHours,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final fillWidth =
-                      constraints.maxWidth * slot.fillFraction;
-                  return Stack(
-                    children: [
-                      if (fillWidth > 0)
-                        SizedBox(
-                          width: fillWidth,
-                          child: ColoredBox(color: slot.category.color),
-                        ),
-                    ],
-                  );
-                },
+              child: ClipRect(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: slot.fillFraction.clamp(0.0, 1.0),
+                  child: ColoredBox(color: slot.category.color),
+                ),
               ),
             ),
         ],
@@ -110,82 +105,31 @@ class _ColoredProgressBar extends StatelessWidget {
   }
 }
 
-class _CategoryLegend extends StatelessWidget {
-  const _CategoryLegend({required this.slots});
-
-  final List<CategoryProgressSlot> slots;
-
+/// Colour-only key under the bar (labels live in the sidebar list).
+class _ColorKeyStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    if (slots.isEmpty) {
-      return Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.25),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Text(
-          'Bar shows progress toward $totalRecommendedHours recommended hours',
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 11,
-            color: Colors.white,
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+    return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
+        color: Colors.white.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            for (final slot in slots) ...[
-              _LegendChip(slot: slot),
-              const SizedBox(width: 10),
-            ],
-          ],
-        ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final category in scheduleCategories)
+            Expanded(
+              flex: recommendedHoursFor(category),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 1, vertical: 3),
+                decoration: BoxDecoration(
+                  color: category.color,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+        ],
       ),
-    );
-  }
-}
-
-class _LegendChip extends StatelessWidget {
-  const _LegendChip({required this.slot});
-
-  final CategoryProgressSlot slot;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            color: slot.category.color,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          '${slot.category.name} ${slot.scheduledHours.toStringAsFixed(1)}/${slot.recommendedHours}h',
-          style: const TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 10,
-            color: Colors.white,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
     );
   }
 }

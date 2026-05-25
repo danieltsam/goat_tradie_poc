@@ -57,9 +57,10 @@ List<CategoryProgressSlot> categoryProgressSlots(List<ScheduleEvent> events) {
       .toList();
 }
 
-/// Categories with any time booked (for legend chips).
-List<CategoryProgressSlot> categoryHourSegments(List<ScheduleEvent> events) {
-  return categoryProgressSlots(events)
-      .where((slot) => slot.scheduledHours > 0.001)
-      .toList();
+/// Display hours consistently in sidebar and elsewhere.
+String formatCategoryHours(double hours) {
+  if (hours <= 0) return '0';
+  final rounded = hours.round();
+  if ((hours - rounded).abs() < 0.05) return '$rounded';
+  return hours.toStringAsFixed(1);
 }
