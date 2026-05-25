@@ -1,5 +1,6 @@
 import 'package:abws_poc/models/schedule_event.dart';
 import 'package:abws_poc/schedule/schedule_categories.dart';
+import 'package:abws_poc/schedule/guided_steps.dart';
 import 'package:abws_poc/schedule/schedule_constants.dart';
 import 'package:abws_poc/widgets/add_event_form.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +16,6 @@ class TabletSidebar extends StatelessWidget {
   final List<ScheduleEvent> events;
   final ValueChanged<ScheduleEvent> onEventAdded;
 
-  static const int totalSteps = 12;
-  static const int currentStepIndex = 0;
-
   double _hoursForCategory(String categoryId) {
     return events
         .where((e) => e.categoryId == categoryId)
@@ -26,7 +24,7 @@ class TabletSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final active = categoryById(guidedStepCategoryIds[currentStepIndex]);
+    final active = categoryById(guidedStepCategoryIds[guidedCurrentStepIndex]);
     final currentHours = _hoursForCategory(active.id);
     final recommended = active.recommendedHours;
 
@@ -64,7 +62,7 @@ class TabletSidebar extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             Text(
-              'Step ${currentStepIndex + 1} of $totalSteps',
+              'Step ${guidedCurrentStepIndex + 1} of $guidedTotalSteps',
               style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 13,

@@ -3,6 +3,7 @@ import 'package:abws_poc/schedule/schedule_constants.dart';
 import 'package:abws_poc/schedule/schedule_layout.dart';
 import 'package:abws_poc/scheduleWidgets/week_grid_view.dart';
 import 'package:abws_poc/widgets/add_event_dialog.dart';
+import 'package:abws_poc/widgets/category_progress_bar.dart';
 import 'package:abws_poc/widgets/tablet_sidebar.dart';
 import 'package:flutter/material.dart';
 
@@ -94,6 +95,10 @@ class _ScheduleHomePageState extends State<ScheduleHomePage> {
           child: Image.asset('assets/icons/goat_temp.png', height: 36, width: 36),
         ),
       ],
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(90),
+        child: ScheduleHeaderProgress(events: _events),
+      ),
     );
   }
 }
