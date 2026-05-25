@@ -1,10 +1,9 @@
 import 'package:abws_poc/models/schedule_event.dart';
 import 'package:abws_poc/schedule/category_hours.dart';
 import 'package:abws_poc/schedule/guided_steps.dart';
-import 'package:abws_poc/schedule/schedule_categories.dart';
 import 'package:flutter/material.dart';
 
-/// Red header strip: step badge, coloured progress bar, colour key (no duplicate text).
+/// Red header strip: step badge + one progress bar (sidebar has the text legend).
 class ScheduleHeaderProgress extends StatelessWidget {
   const ScheduleHeaderProgress({
     super.key,
@@ -45,24 +44,9 @@ class ScheduleHeaderProgress extends StatelessWidget {
           ),
           const SizedBox(width: 15),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: _ColoredProgressBar(slots: slots),
-                  ),
-                ),
-                Expanded(
-                  flex: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    child: _ColorKeyStrip(),
-                  ),
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: _ColoredProgressBar(slots: slots),
             ),
           ),
         ],
@@ -71,7 +55,7 @@ class ScheduleHeaderProgress extends StatelessWidget {
   }
 }
 
-/// Bar width = recommended hours per category; fill = scheduled ÷ recommended.
+/// One bar: slot width = recommended hours; coloured fill = hours booked in that area.
 class _ColoredProgressBar extends StatelessWidget {
   const _ColoredProgressBar({required this.slots});
 
@@ -88,15 +72,12 @@ class _ColoredProgressBar extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final slot in slots)
+          for (var i = 0; i < slots.length; i++)
             Expanded(
-              flex: slot.recommendedHours,
-              child: ClipRect(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  widthFactor: slot.fillFraction.clamp(0.0, 1.0),
-                  child: ColoredBox(color: slot.category.color),
-                ),
+              flex: slots[i].recommendedHours,
+              child: _ProgressSlot(
+                slot: slots[i],
+                showRightBorder: i < slots.length - 1,
               ),
             ),
         ],
@@ -105,31 +86,46 @@ class _ColoredProgressBar extends StatelessWidget {
   }
 }
 
-/// Colour-only key under the bar (labels live in the sidebar list).
-class _ColorKeyStrip extends StatelessWidget {
+class _ProgressSlot extends StatelessWidget {
+  const _ProgressSlot({
+    required this.slot,
+    required this.showRightBorder,
+  });
+
+  final CategoryProgressSlot slot;
+  final bool showRightBorder;
+
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.25),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (final category in scheduleCategories)
-            Expanded(
-              flex: recommendedHoursFor(category),
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 1, vertical: 3),
-                decoration: BoxDecoration(
-                  color: category.color,
-                  borderRadius: BorderRadius.circular(2),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final fillWidth = constraints.maxWidth * slot.fillFraction.clamp(0.0, 1.0);
+
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            border: showRightBorder
+                ? Border(
+                    right: BorderSide(
+                      color: Colors.black.withValues(alpha: 0.12),
+                    ),
+                  )
+                : null,
+          ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (fillWidth > 0)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: fillWidth,
+                  child: ColoredBox(color: slot.category.color),
                 ),
-              ),
-            ),
-        ],
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

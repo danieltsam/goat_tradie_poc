@@ -22,7 +22,7 @@ flutter run -d chrome   # resize wide (≥600px) for tablet, narrow for phone
 | `lib/models/schedule_event.dart` | Event data class |
 | `lib/widgets/add_event_form.dart` | **Shared form** — day, start/end (platform time picker), Add button |
 | `lib/widgets/time_picker_button.dart` | Opens `showTimePicker` |
-| `lib/widgets/category_progress_bar.dart` | Header step badge + coloured bar + legend |
+| `lib/widgets/category_progress_bar.dart` | Header step badge + single coloured progress bar |
 | `lib/schedule/category_hours.dart` | Sum hours per category from events |
 | `lib/widgets/tablet_sidebar.dart` | Tablet-only left panel |
 | `lib/widgets/add_event_dialog.dart` | Phone: dialog around `AddEventForm` |
