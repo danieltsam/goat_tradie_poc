@@ -2,10 +2,15 @@
 
 Tablet-first weekly planner POC (G.O.A.T Tradie).
 
+## Platforms
+
+Tracked in repo: **Android**, **web** (Chrome), **iOS** (optional iPad later). Desktop `linux/`, `windows/`, and `macos/` folders were removed.
+
 ## Run
 
 ```bash
-flutter run -d chrome
+flutter run -d chrome          # dev (author-tested)
+flutter run                    # Android emulator / device
 ```
 
 Wide window (≥600px) = tablet (sidebar + grid). Narrow = phone (+ button opens add dialog).
