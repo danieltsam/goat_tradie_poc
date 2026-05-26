@@ -1,48 +1,221 @@
 import 'package:flutter/material.dart';
-import '../scheduleWidgets/schedulewidgets.dart';
 
+class WeeklyScheduleBody extends StatelessWidget {
+  const WeeklyScheduleBody({
+    super.key,
+    required this.events,
+  });
 
-Future<void> _showAddSchedule(BuildContext context)  async{
+  static const List<String> days = [
+    'Mon',
+    'Tues',
+    'Wed',
+    'Thur',
+    'Fri',
+    'Sat',
+    'Sun',
+  ];
+
+  final List<ScheduleBlock> events;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        color: Colors.white,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: List.generate(
+            days.length,
+            (index) => Expanded(
+              child: _DayColumn(
+                day: days[index],
+                isLast: index == days.length - 1,
+                events: events
+                    .where((event) => event.day == days[index])
+                    .toList(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DayColumn extends StatelessWidget {
+  final String day;
+  final bool isLast;
+  final List<ScheduleBlock> events;
+
+  const _DayColumn({
+    required this.day,
+    required this.isLast,
+    required this.events,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context); // Shorthand saves from writing whole thing
+
+    final screenHeight = mediaQuery.size.height;
+    final paddingTop = mediaQuery.padding.top;
+    final appBarHeight = kToolbarHeight;
+
+    final usableHeight = screenHeight - paddingTop - appBarHeight - 140;
+
+    final heightPerHour = usableHeight / 24.0;
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 3,
+            vertical: 8,
+          ),
+          child: Container(
+            height: 32,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.grey,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              day.substring(0, 3),
+              style: const TextStyle(
+                fontSize: 16,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ),
+        ),
+
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                right: isLast
+                    ? BorderSide.none
+                    : BorderSide(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        width: 1,
+                      ),
+              ),
+            ),
+            child: Stack(
+              children: events.map((event) {
+                final start =
+                    timeToDouble(event.startTime);
+
+                final end =
+                    timeToDouble(event.endTime);
+
+                final duration = end - start;
+
+                return Positioned(
+                  top: start * heightPerHour,
+                  left: 4,
+                  right: 4,
+                  child: Container(
+                    height: duration * heightPerHour,
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text("Persoanl Time"
+                        "${event.startTime.format(context)} - "
+                        "${event.endTime.format(context)}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+double timeToDouble(TimeOfDay myTime) {
+  return myTime.hour + (myTime.minute / 60.0);
+}
+
+class ScheduleBlock {
+  final String day;
+  final TimeOfDay startTime;
+  final TimeOfDay endTime;
+
+  ScheduleBlock({
+    required this.day,
+    required this.startTime,
+    required this.endTime,
+  });
+}
+
+Future<ScheduleBlock?> _showAddSchedule(
+    BuildContext context) async {
   TimeOfDay startTime = TimeOfDay.now();
   TimeOfDay endTime = TimeOfDay.now();
-  String? selectedDay = 'Monday';
+  String? selectedDay = 'Mon';
 
-  await showDialog(
+  return await showDialog<ScheduleBlock>(
     context: context,
     builder: (BuildContext context) {
-      return StatefulBuilder(builder: (context, setState) {
-      
-      return AlertDialog( 
-        title: Text(('Add Personal Time'), textAlign: TextAlign.center),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-          ListTile(
-            title: Text("Start Time: ${startTime.format(context)}"),
-            trailing: const Icon(Icons.access_time),
-            onTap: () async{
-              final picked = await showTimePicker(
-                context: context,
-              initialTime: startTime,);
-              if (picked != null) setState(() => startTime = picked);
-            }
-          ),
-           ListTile(
-            title: Text("End Time: ${endTime.format(context)}"),
-            trailing: const Icon(Icons.access_time),
-            onTap: () async{
-              final picked = await showTimePicker(
-                context: context,
-              initialTime: endTime,);
-              if (picked != null) setState(() => endTime = picked);
-            }
-          ),
-          const SizedBox(height: 20),
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text(
+              'Add Personal Time',
+              textAlign: TextAlign.center,
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: Text(
+                    "Start Time: ${startTime.format(context)}",
+                  ),
+                  trailing: const Icon(Icons.access_time),
+                  onTap: () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: startTime,
+                    );
 
-          DropdownButton<String>(
+                    if (picked != null) {setState(() => startTime = picked);
+                    }
+                  },
+                ),
+
+                ListTile(
+                  title: Text(
+                    "End Time: ${endTime.format(context)}",
+                  ),
+                  trailing: const Icon(Icons.access_time),
+                  onTap: () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: endTime,
+                    );
+                    if (picked != null) {setState(() => endTime = picked);
+                    }
+                  },
+                ),
+
+                const SizedBox(height: 20),
+
+                DropdownButton<String>(
                   value: selectedDay,
                   isExpanded: true,
-                  items: <String>['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                  items: WeeklyScheduleBody.days
                       .map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -55,48 +228,62 @@ Future<void> _showAddSchedule(BuildContext context)  async{
                 ),
               ],
             ),
-            actions: 
-              [
+            actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () =>
+                    Navigator.pop(context),
                 child: const Text('Cancel'),
               ),
+
               ElevatedButton(
                 onPressed: () {
-                  // No functionality currently
-                  Navigator.pop(context);
+                  Navigator.pop(
+                    context,
+                    ScheduleBlock(
+                      day: selectedDay!,
+                      startTime: startTime,
+                      endTime: endTime,
+                    ),
+                  );
                 },
                 child: const Text('Save'),
               ),
             ],
-            
-
-
-
-        
-        // TODO: Fix that and implement,
-
+          );
+        },
       );
-    }
-    );
     },
   );
 }
 
-class ScheduleHomePage extends StatelessWidget {
+class ScheduleHomePage extends StatefulWidget {
   const ScheduleHomePage({super.key});
+
+  @override
+  State<ScheduleHomePage> createState() =>
+      _ScheduleHomePageState();
+}
+
+class _ScheduleHomePageState
+    extends State<ScheduleHomePage> {
+
+  final List<ScheduleBlock> events = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       //Header
       appBar: appBar(),
-      
+
       // body
-      body: const WeeklyScheduleBody(),
-        
-      //Footer
+      body: Column(
+        children: [
+          WeeklyScheduleBody(events: events),
+        ],
+      ),
+
       floatingActionButton: floatingActionButton(context),
+
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
@@ -223,10 +410,11 @@ class ScheduleHomePage extends StatelessWidget {
     );
   }
 
-  //Contains the footers buttons.
-  Widget floatingActionButton(BuildContext context) {
+  Widget floatingActionButton(
+      BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment:
+          MainAxisAlignment.spaceEvenly,
       children: [
         FloatingActionButton(
           heroTag: "btn1",
@@ -238,10 +426,19 @@ class ScheduleHomePage extends StatelessWidget {
         ),
 
         const SizedBox(width: 10),
+
         FloatingActionButton(
           heroTag: "btn2",
-          onPressed: (){
-          _showAddSchedule(context);
+          onPressed: () async {
+
+            final newEvent =
+                await _showAddSchedule(context);
+
+            if (newEvent != null) {
+              setState(() {
+                events.add(newEvent);
+              });
+            }
           },
           foregroundColor: Colors.black,
           backgroundColor: Colors.red,
@@ -250,6 +447,7 @@ class ScheduleHomePage extends StatelessWidget {
         ),
 
         const SizedBox(width: 10),
+
         FloatingActionButton(
           heroTag: "btn3",
           onPressed: () {},
@@ -262,9 +460,5 @@ class ScheduleHomePage extends StatelessWidget {
     );
   }
 
-
-
+   
 }
-
-
-
