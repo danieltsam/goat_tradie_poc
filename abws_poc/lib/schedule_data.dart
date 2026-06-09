@@ -100,15 +100,28 @@ double hoursForCategory(List<ScheduleEvent> events, String categoryId) {
       .fold<double>(0, (sum, e) => sum + e.durationMinutes / 60);
 }
 
-List<({ScheduleCategory category, int flex, double fill})> categoryProgressSlots(
+String formatHours(double hours) {
+  if (hours <= 0) return '0';
+  final rounded = hours.round();
+  if ((hours - rounded).abs() < 0.05) return '$rounded';
+  return hours.toStringAsFixed(1);
+}
+
+int progressFlexForHours(double hours) {
+  if (hours <= 0) return 1;
+  return (hours * 10).round().clamp(2, 500);
+}
+
+/// Bar segment width scales with booked hours; colour fills the whole segment.
+List<({ScheduleCategory category, int flex, double hours})> categoryProgressSlots(
   List<ScheduleEvent> events,
 ) {
   return [
     for (final category in scheduleCategories)
       (
         category: category,
-        flex: category.recommendedHours,
-        fill: (hoursForCategory(events, category.id) / category.recommendedHours).clamp(0.0, 1.0),
+        hours: hoursForCategory(events, category.id),
+        flex: progressFlexForHours(hoursForCategory(events, category.id)),
       ),
   ];
 }

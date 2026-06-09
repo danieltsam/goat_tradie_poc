@@ -1,4 +1,5 @@
 import 'package:abws_poc/main.dart';
+import 'package:abws_poc/scheduleWidgets/category_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -13,7 +14,8 @@ void main() {
 
     expect(find.text('A Better Weekly Schedule'), findsOneWidget);
     expect(find.text('Step 3 of 5'), findsOneWidget);
-    expect(find.text('Family Time'), findsWidgets);
+    expect(find.textContaining('Family Time'), findsWidgets);
+    expect(find.byType(CategoryProgressBar), findsOneWidget);
     expect(find.text('Sun'), findsOneWidget);
     expect(find.byIcon(Icons.add), findsOneWidget);
 

@@ -122,7 +122,7 @@ class _ScheduleHomePageState extends State<ScheduleHomePage> {
                 const SizedBox(height: 8),
                 CategoryProgressBar(events: _events),
                 const SizedBox(height: 10),
-                const CategoryLegend(),
+                CategoryLegend(events: _events),
               ],
             ),
           ),
