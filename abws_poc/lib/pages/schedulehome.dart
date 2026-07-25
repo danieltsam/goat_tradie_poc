@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 class WeeklyScheduleBody extends StatelessWidget {
-  const WeeklyScheduleBody({
-    super.key,
-    required this.events,
-  });
+  const WeeklyScheduleBody({super.key, required this.events});
 
   static const List<String> days = [
     'Mon',
@@ -56,7 +53,9 @@ class _DayColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context); // Shorthand saves from writing whole thing
+    final mediaQuery = MediaQuery.of(
+      context,
+    ); // Shorthand saves from writing whole thing
 
     final screenHeight = mediaQuery.size.height;
     final paddingTop = mediaQuery.padding.top;
@@ -69,10 +68,7 @@ class _DayColumn extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 3,
-            vertical: 8,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
           child: Container(
             height: 32,
             alignment: Alignment.center,
@@ -82,10 +78,7 @@ class _DayColumn extends StatelessWidget {
             ),
             child: Text(
               day.substring(0, 3),
-              style: const TextStyle(
-                fontSize: 16,
-                fontFamily: 'Inter',
-              ),
+              style: const TextStyle(fontSize: 16, fontFamily: 'Inter'),
             ),
           ),
         ),
@@ -104,11 +97,9 @@ class _DayColumn extends StatelessWidget {
             ),
             child: Stack(
               children: events.map((event) {
-                final start =
-                    timeToDouble(event.startTime);
+                final start = timeToDouble(event.startTime);
 
-                final end =
-                    timeToDouble(event.endTime);
+                final end = timeToDouble(event.endTime);
 
                 final duration = end - start;
 
@@ -123,7 +114,8 @@ class _DayColumn extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
-                      child: Text("Persoanl Time"
+                      child: Text(
+                        "Persoanl Time"
                         "${event.startTime.format(context)} - "
                         "${event.endTime.format(context)}",
                         style: const TextStyle(
@@ -160,8 +152,7 @@ class ScheduleBlock {
   });
 }
 
-Future<ScheduleBlock?> _showAddSchedule(
-    BuildContext context) async {
+Future<ScheduleBlock?> _showAddSchedule(BuildContext context) async {
   TimeOfDay startTime = TimeOfDay.now();
   TimeOfDay endTime = TimeOfDay.now();
   String? selectedDay = 'Mon';
@@ -172,17 +163,12 @@ Future<ScheduleBlock?> _showAddSchedule(
       return StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            title: const Text(
-              'Add Personal Time',
-              textAlign: TextAlign.center,
-            ),
+            title: const Text('Add Personal Time', textAlign: TextAlign.center),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-                  title: Text(
-                    "Start Time: ${startTime.format(context)}",
-                  ),
+                  title: Text("Start Time: ${startTime.format(context)}"),
                   trailing: const Icon(Icons.access_time),
                   onTap: () async {
                     final picked = await showTimePicker(
@@ -190,22 +176,22 @@ Future<ScheduleBlock?> _showAddSchedule(
                       initialTime: startTime,
                     );
 
-                    if (picked != null) {setState(() => startTime = picked);
+                    if (picked != null) {
+                      setState(() => startTime = picked);
                     }
                   },
                 ),
 
                 ListTile(
-                  title: Text(
-                    "End Time: ${endTime.format(context)}",
-                  ),
+                  title: Text("End Time: ${endTime.format(context)}"),
                   trailing: const Icon(Icons.access_time),
                   onTap: () async {
                     final picked = await showTimePicker(
                       context: context,
                       initialTime: endTime,
                     );
-                    if (picked != null) {setState(() => endTime = picked);
+                    if (picked != null) {
+                      setState(() => endTime = picked);
                     }
                   },
                 ),
@@ -215,8 +201,7 @@ Future<ScheduleBlock?> _showAddSchedule(
                 DropdownButton<String>(
                   value: selectedDay,
                   isExpanded: true,
-                  items: WeeklyScheduleBody.days
-                      .map((String value) {
+                  items: WeeklyScheduleBody.days.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -230,8 +215,7 @@ Future<ScheduleBlock?> _showAddSchedule(
             ),
             actions: [
               TextButton(
-                onPressed: () =>
-                    Navigator.pop(context),
+                onPressed: () => Navigator.pop(context),
                 child: const Text('Cancel'),
               ),
 
@@ -260,13 +244,10 @@ class ScheduleHomePage extends StatefulWidget {
   const ScheduleHomePage({super.key});
 
   @override
-  State<ScheduleHomePage> createState() =>
-      _ScheduleHomePageState();
+  State<ScheduleHomePage> createState() => _ScheduleHomePageState();
 }
 
-class _ScheduleHomePageState
-    extends State<ScheduleHomePage> {
-
+class _ScheduleHomePageState extends State<ScheduleHomePage> {
   final List<ScheduleBlock> events = [];
 
   @override
@@ -276,11 +257,7 @@ class _ScheduleHomePageState
       appBar: appBar(),
 
       // body
-      body: Column(
-        children: [
-          WeeklyScheduleBody(events: events),
-        ],
-      ),
+      body: Column(children: [WeeklyScheduleBody(events: events)]),
 
       floatingActionButton: floatingActionButton(context),
 
@@ -292,7 +269,11 @@ class _ScheduleHomePageState
     return AppBar(
       title: const Text(
         'A Better Weekly Structure',
-        style: TextStyle(color: Colors.black, fontSize: 18, fontFamily: 'HighVoltage'),
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 18,
+          fontFamily: 'HighVoltage',
+        ),
       ),
       backgroundColor: Colors.red,
       elevation: 0.0,
@@ -364,19 +345,19 @@ class _ScheduleHomePageState
               const SizedBox(
                 width: 15,
               ), // Add a little gap between the square and the text
-
               //The progress bar and legend
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-
                     //The progress bar
                     Expanded(
                       flex: 3,
                       child: Container(
                         //color: Colors.blue, // Placeholder for top box
-                        padding: const EdgeInsets.all(5.0), // Creates the inset space
+                        padding: const EdgeInsets.all(
+                          5.0,
+                        ), // Creates the inset space
                         alignment: Alignment.centerLeft,
                         child: Container(
                           width: double.infinity, // Spans the full inset width
@@ -387,7 +368,7 @@ class _ScheduleHomePageState
                         ),
                       ),
                     ),
-                    
+
                     //The legend
                     Expanded(
                       flex: 4,
@@ -410,11 +391,9 @@ class _ScheduleHomePageState
     );
   }
 
-  Widget floatingActionButton(
-      BuildContext context) {
+  Widget floatingActionButton(BuildContext context) {
     return Row(
-      mainAxisAlignment:
-          MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         FloatingActionButton(
           heroTag: "btn1",
@@ -430,9 +409,7 @@ class _ScheduleHomePageState
         FloatingActionButton(
           heroTag: "btn2",
           onPressed: () async {
-
-            final newEvent =
-                await _showAddSchedule(context);
+            final newEvent = await _showAddSchedule(context);
 
             if (newEvent != null) {
               setState(() {
@@ -459,6 +436,4 @@ class _ScheduleHomePageState
       ],
     );
   }
-
-   
 }
