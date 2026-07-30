@@ -112,11 +112,13 @@ class _DayColumn extends StatelessWidget {
 
                 final duration = end - start;
 
-                return Positioned(
+                return Stack(
+                  children: [Positioned(
                   top: start * heightPerHour,
                   left: 4,
                   right: 4,
-                  child: Container(
+                  child: GestureDetector(onTap: () { print('Positioned widget tapped!');},
+                   child: Container(
                     height: duration * heightPerHour,
                     decoration: BoxDecoration(
                       color: Colors.green,
@@ -134,6 +136,9 @@ class _DayColumn extends StatelessWidget {
                       ),
                     ),
                   ),
+                  )
+                  )
+                  ]
                 );
               }).toList(),
             ),
