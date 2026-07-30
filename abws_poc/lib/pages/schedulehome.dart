@@ -117,7 +117,25 @@ class _DayColumn extends StatelessWidget {
                   top: start * heightPerHour,
                   left: 4,
                   right: 4,
-                  child: GestureDetector(onTap: () { print('Positioned widget tapped!');},
+                  child: GestureDetector(onTap: ()  {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Personal Time" ),
+          content: const Text("temp"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Closes the dialog
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  },
                    child: Container(
                     height: duration * heightPerHour,
                     decoration: BoxDecoration(
@@ -125,7 +143,7 @@ class _DayColumn extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
-                      child: Text("Persoanl Time"
+                      child: Text("Personal Time "
                         "${event.startTime.format(context)} - "
                         "${event.endTime.format(context)}",
                         style: const TextStyle(
