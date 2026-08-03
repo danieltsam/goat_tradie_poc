@@ -1,5 +1,34 @@
 import 'package:flutter/material.dart';
 
+class ScheduleEvent {
+  final String id;
+  final String eventType;
+  final String day;
+  final TimeOfDay startTime;
+  final TimeOfDay endTime;
+
+  const ScheduleEvent({
+    required this.id,
+    required this.eventType,
+    required this.day,
+    required this.startTime,
+    required this.endTime,
+  });
+
+  /// Convert to Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      'eventType': eventType,
+      'day': day,
+      'startHour': startTime.hour,
+      'startMinute': startTime.minute,
+      'endHour': endTime.hour,
+      'endMinute': endTime.minute,
+    };
+  }
+}
+
+
 class WeeklyScheduleBody extends StatelessWidget {
   const WeeklyScheduleBody({
     super.key,
@@ -16,7 +45,7 @@ class WeeklyScheduleBody extends StatelessWidget {
     'Sun',
   ];
 
-  final List<ScheduleBlock> events;
+  final List<ScheduleEvent> events;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +75,7 @@ class WeeklyScheduleBody extends StatelessWidget {
 class _DayColumn extends StatelessWidget {
   final String day;
   final bool isLast;
-  final List<ScheduleBlock> events;
+  final List<ScheduleEvent> events;
 
   const _DayColumn({
     required this.day,
@@ -106,24 +135,42 @@ class _DayColumn extends StatelessWidget {
               children: events.map((event) {
                 final start =
                     timeToDouble(event.startTime);
-
                 final end =
                     timeToDouble(event.endTime);
-
                 final duration = end - start;
-
-                return Positioned(
+                return Stack(
+                  children: [Positioned(
                   top: start * heightPerHour,
                   left: 4,
                   right: 4,
-                  child: Container(
+                  child: GestureDetector(onTap: ()  {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Personal Time" ),
+          content: Text("${event.startTime.format(context)} - "
+                        "${event.endTime.format(context)}",),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Closes the dialog
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  },
+                   child: Container(
                     height: duration * heightPerHour,
                     decoration: BoxDecoration(
                       color: Colors.green,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
-                      child: Text("Persoanl Time"
+                      child: Text("Personal Time "
                         "${event.startTime.format(context)} - "
                         "${event.endTime.format(context)}",
                         style: const TextStyle(
@@ -134,6 +181,9 @@ class _DayColumn extends StatelessWidget {
                       ),
                     ),
                   ),
+                  )
+                  )
+                  ]
                 );
               }).toList(),
             ),
@@ -148,6 +198,7 @@ double timeToDouble(TimeOfDay myTime) {
   return myTime.hour + (myTime.minute / 60.0);
 }
 
+/// Redundant, replaced by ScheduleEvent, not removed for backup purposes
 class ScheduleBlock {
   final String day;
   final TimeOfDay startTime;
@@ -160,13 +211,13 @@ class ScheduleBlock {
   });
 }
 
-Future<ScheduleBlock?> _showAddSchedule(
+Future<ScheduleEvent?> _showAddSchedule(
     BuildContext context) async {
   TimeOfDay startTime = TimeOfDay.now();
   TimeOfDay endTime = TimeOfDay.now();
   String? selectedDay = 'Mon';
 
-  return await showDialog<ScheduleBlock>(
+  return await showDialog<ScheduleEvent>(
     context: context,
     builder: (BuildContext context) {
       return StatefulBuilder(
@@ -239,7 +290,9 @@ Future<ScheduleBlock?> _showAddSchedule(
                 onPressed: () {
                   Navigator.pop(
                     context,
-                    ScheduleBlock(
+                    ScheduleEvent(
+                      id: 'Sample',
+                      eventType: 'Personal Time (Sampel)',
                       day: selectedDay!,
                       startTime: startTime,
                       endTime: endTime,
@@ -267,7 +320,7 @@ class ScheduleHomePage extends StatefulWidget {
 class _ScheduleHomePageState
     extends State<ScheduleHomePage> {
 
-  final List<ScheduleBlock> events = [];
+  final List<ScheduleEvent> events = [];
 
   @override
   Widget build(BuildContext context) {
