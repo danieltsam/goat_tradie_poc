@@ -46,7 +46,7 @@ class WeeklyScheduleBody extends StatelessWidget {
   ];
 
   final List<ScheduleEvent> events;
-
+// Creates the white background of the weekly structure, generates it based on length of days
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -95,6 +95,7 @@ class _DayColumn extends StatelessWidget {
 
     final heightPerHour = usableHeight / 24.0;
 
+// This column is responsible for the headings above the rows (of the day name)
     return Column(
       children: [
         Padding(
@@ -512,6 +513,4 @@ class _ScheduleHomePageState
       ],
     );
   }
-
-   
 }
