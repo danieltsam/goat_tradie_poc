@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:abws_poc/Event/schedule_event.dart';
 import 'package:abws_poc/Event/event_widget.dart';
 
+// Used to implement the lists of colours and event types, not directly used to track step count (yet)
+int stepTracker = 0;
 
 class WeeklyScheduleBody extends StatelessWidget {
   const WeeklyScheduleBody({
@@ -146,8 +148,8 @@ Future<ScheduleEvent?> _showAddSchedule(
       return StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            title: const Text(
-              'Add Personal Time',
+            title: Text(
+              "Add ${eventSteps[stepTracker]}",
               textAlign: TextAlign.center,
             ),
             content: Column(
@@ -215,10 +217,11 @@ Future<ScheduleEvent?> _showAddSchedule(
                     context,
                     ScheduleEvent(
                       id: 'Sample',
-                      eventType: 'Personal Time (Sampel)',
+                      eventType: eventSteps[stepTracker],
                       day: selectedDay!,
                       startTime: startTime,
                       endTime: endTime,
+                      eventColor: eventColors[stepTracker]
                     ),
                   );
                 },
@@ -426,7 +429,8 @@ class _ScheduleHomePageState
 
         FloatingActionButton(
           heroTag: "btn3",
-          onPressed: () {},
+          onPressed: (
+          ) {stepTracker++;},
           foregroundColor: Colors.black,
           backgroundColor: Colors.red,
           shape: const CircleBorder(),
