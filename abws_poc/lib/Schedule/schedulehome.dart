@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:abws_poc/Event/schedule_event.dart';
 import 'package:abws_poc/Event/event_widget.dart';
 
-// Used to implement the lists of colours and event types, not directly used to track step count (yet)
-int stepTracker = 0;
-
 class WeeklyScheduleBody extends StatelessWidget {
   const WeeklyScheduleBody({
     super.key,
@@ -137,7 +134,7 @@ class ScheduleBlock {
 }
 
 Future<ScheduleEvent?> _showAddSchedule(
-    BuildContext context) async {
+    BuildContext context, int currentStep) async {
   TimeOfDay startTime = TimeOfDay.now();
   TimeOfDay endTime = TimeOfDay.now();
   String? selectedDay = 'Mon';
@@ -149,7 +146,7 @@ Future<ScheduleEvent?> _showAddSchedule(
         builder: (context, setState) {
           return AlertDialog(
             title: Text(
-              "Add ${eventSteps[stepTracker]}",
+              "Add ${eventTypes[currentStep].name}",
               textAlign: TextAlign.center,
             ),
             content: Column(
@@ -217,11 +214,10 @@ Future<ScheduleEvent?> _showAddSchedule(
                     context,
                     ScheduleEvent(
                       id: 'Sample',
-                      eventType: eventSteps[stepTracker],
+                      eventType: eventTypes[currentStep].name,
                       day: selectedDay!,
                       startTime: startTime,
                       endTime: endTime,
-                      eventColor: eventColors[stepTracker]
                     ),
                   );
                 },
@@ -246,6 +242,7 @@ class ScheduleHomePage extends StatefulWidget {
 class _ScheduleHomePageState
     extends State<ScheduleHomePage> {
 
+  int _stepTracker = 0;
   final List<ScheduleEvent> events = [];
 
   @override
@@ -410,8 +407,7 @@ class _ScheduleHomePageState
           heroTag: "btn2",
           onPressed: () async {
 
-            final newEvent =
-                await _showAddSchedule(context);
+            final newEvent = await _showAddSchedule(context, _stepTracker);
 
             if (newEvent != null) {
               setState(() {
@@ -429,8 +425,11 @@ class _ScheduleHomePageState
 
         FloatingActionButton(
           heroTag: "btn3",
-          onPressed: (
-          ) {stepTracker++;},
+          onPressed: () {
+            if (_stepTracker < eventTypes.length - 1) {
+              setState(() => _stepTracker++);
+            }
+          },
           foregroundColor: Colors.black,
           backgroundColor: Colors.red,
           shape: const CircleBorder(),

@@ -26,7 +26,7 @@ class EventWidget extends StatelessWidget {
       child: Container(
         height: duration * heightPerHour,
         decoration: BoxDecoration(
-          color: event.eventColor, // Uses the color from the ScheduleEvent object
+          color: event.color, // Uses the color from the ScheduleEvent object
           borderRadius: BorderRadius.circular(8),
         ),
         
