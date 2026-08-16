@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:abws_poc/Event/schedule_event.dart';
+import 'package:abws_poc/Event/event_model.dart';
 import 'package:abws_poc/Event/event_widget.dart';
 
 class WeeklyScheduleBody extends StatelessWidget {
@@ -18,7 +18,7 @@ class WeeklyScheduleBody extends StatelessWidget {
     'Sun',
   ];
 
-  final List<ScheduleEvent> events;
+  final List<EventModel> events;
 // Creates the white background of the weekly structure, generates it based on length of days
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class WeeklyScheduleBody extends StatelessWidget {
 class _DayColumn extends StatelessWidget {
   final String day;
   final bool isLast;
-  final List<ScheduleEvent> events;
+  final List<EventModel> events;
 
   const _DayColumn({
     required this.day,
@@ -108,7 +108,7 @@ class _DayColumn extends StatelessWidget {
             child: Stack(
               children: events
                   .map((event) => EventWidget(
-                        event: event,
+                        model: event,
                         heightPerHour: heightPerHour,
                       ))
                   .toList(),
@@ -120,26 +120,26 @@ class _DayColumn extends StatelessWidget {
   }
 }
 
-/// Redundant, replaced by ScheduleEvent, not removed for backup purposes
+/// Redundant, replaced by EventModel, not removed for backup purposes
 class ScheduleBlock {
   final String day;
   final TimeOfDay startTime;
   final TimeOfDay endTime;
 
-  ScheduleBlock({
+  const ScheduleBlock({
     required this.day,
     required this.startTime,
     required this.endTime,
   });
 }
 
-Future<ScheduleEvent?> _showAddSchedule(
+Future<EventModel?> _showAddSchedule(
     BuildContext context, int currentStep) async {
   TimeOfDay startTime = TimeOfDay.now();
   TimeOfDay endTime = TimeOfDay.now();
   String? selectedDay = 'Mon';
 
-  return await showDialog<ScheduleEvent>(
+  return await showDialog<EventModel>(
     context: context,
     builder: (BuildContext context) {
       return StatefulBuilder(
@@ -212,7 +212,7 @@ Future<ScheduleEvent?> _showAddSchedule(
                 onPressed: () {
                   Navigator.pop(
                     context,
-                    ScheduleEvent(
+                    EventModel(
                       id: 'Sample',
                       eventType: eventTypes[currentStep].name,
                       day: selectedDay!,
@@ -243,7 +243,7 @@ class _ScheduleHomePageState
     extends State<ScheduleHomePage> {
 
   int _stepTracker = 0;
-  final List<ScheduleEvent> events = [];
+  final List<EventModel> events = [];
 
   @override
   Widget build(BuildContext context) {

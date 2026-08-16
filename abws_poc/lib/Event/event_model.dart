@@ -27,14 +27,14 @@ EventType getEventTypeDetails(String name) {
   return eventTypes.firstWhere((type) => type.name == name, orElse: () => const EventType('Unknown', Colors.grey));
 }
 
-class ScheduleEvent {
+class EventModel {
   final String id;
   final String eventType;
   final String day;
   final TimeOfDay startTime;
   final TimeOfDay endTime;
 
-  const ScheduleEvent({
+  const EventModel({
     required this.id,
     required this.eventType,
     required this.day,

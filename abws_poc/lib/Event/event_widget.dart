@@ -1,21 +1,21 @@
-import 'package:abws_poc/Event/schedule_event.dart';
+import 'package:abws_poc/Event/event_model.dart';
 import 'package:flutter/material.dart';
 
 class EventWidget extends StatelessWidget {
   const EventWidget({
     super.key,
-    required this.event,
+    required this.model,
     required this.heightPerHour,
   });
 
-  final ScheduleEvent event; //The type of event this widget is
+  final EventModel model; //The data model for this widget
   final double heightPerHour; //The calculated height this widget will be so it is proportional to the height of the day.
 
   @override
   Widget build(BuildContext context) {
     
-    final start = timeToDouble(event.startTime);
-    final end = timeToDouble(event.endTime);
+    final start = timeToDouble(model.startTime);
+    final end = timeToDouble(model.endTime);
     final duration = end - start;
 
     return Positioned(
@@ -26,13 +26,13 @@ class EventWidget extends StatelessWidget {
       child: Container(
         height: duration * heightPerHour,
         decoration: BoxDecoration(
-          color: event.color, // Uses the color from the ScheduleEvent object
+          color: model.color, // Uses the color from the EventModel object
           borderRadius: BorderRadius.circular(8),
         ),
         
         child: Center(
           child: Text(
-            "${event.eventType} ${event.startTime.format(context)} - ${event.endTime.format(context)}",
+            "${model.eventType} ${model.startTime.format(context)} - ${model.endTime.format(context)}",
             style: const TextStyle(color: Colors.white, fontSize: 12),
             textAlign: TextAlign.center,
           ),
