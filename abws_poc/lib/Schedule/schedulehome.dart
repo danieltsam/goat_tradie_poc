@@ -397,7 +397,26 @@ class _ScheduleHomePageState
       children: [
         FloatingActionButton(
           heroTag: "btn1",
-          onPressed: () {},
+          onPressed: () {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Information'),
+            content: const Text('Placeholder'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Perform your action here
+                  Navigator.pop(context);
+                },
+                child: const Text('Cancel'),
+              ),
+            ],
+          );
+        },
+      );
+    },
           foregroundColor: Colors.black,
           backgroundColor: Colors.red,
           shape: const CircleBorder(),
