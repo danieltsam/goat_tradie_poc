@@ -1,4 +1,4 @@
-import 'package:abws_poc/Questionaire/questionaire.dart';
+import 'package:abws_poc/Schedule/schedulehome.dart';
 
 import 'package:flutter/material.dart';
 
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Inter'),
-      home: const QuestionnaireWidget(),
+      home: const ScheduleHomePage(),
     );
   }
 }
