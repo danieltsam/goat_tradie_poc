@@ -64,7 +64,7 @@ class EventWidget extends StatelessWidget {
 
                             if (picked != null) {
                               setState(() {
-                                model.startTime = picked;
+                                model.startTime = picked; // When updating, you need to reload, will issue fix shortly
                               });
                             }
                           },

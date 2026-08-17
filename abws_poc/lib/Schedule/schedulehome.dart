@@ -403,7 +403,7 @@ class _ScheduleHomePageState
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Information'),
-            content: const Text('Placeholder'),
+            content: const Text('Placeholder'), // Include, What is ABWS, How to use, and why can't I put work first?
             actions: [
               TextButton(
                 onPressed: () {
