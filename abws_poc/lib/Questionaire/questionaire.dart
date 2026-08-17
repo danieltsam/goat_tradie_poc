@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'schedulehome.dart';
+import '../Schedule/schedulehome.dart';
 
 class Question {
   final String text;

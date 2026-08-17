@@ -1,33 +1,6 @@
 import 'package:flutter/material.dart';
-
-class ScheduleEvent {
-  final String id;
-  final String eventType;
-  final String day;
-  final TimeOfDay startTime;
-  final TimeOfDay endTime;
-
-  const ScheduleEvent({
-    required this.id,
-    required this.eventType,
-    required this.day,
-    required this.startTime,
-    required this.endTime,
-  });
-
-  /// Convert to Firestore
-  Map<String, dynamic> toMap() {
-    return {
-      'eventType': eventType,
-      'day': day,
-      'startHour': startTime.hour,
-      'startMinute': startTime.minute,
-      'endHour': endTime.hour,
-      'endMinute': endTime.minute,
-    };
-  }
-}
-
+import 'package:abws_poc/Event/event_model.dart';
+import 'package:abws_poc/Event/event_widget.dart';
 
 class WeeklyScheduleBody extends StatelessWidget {
   const WeeklyScheduleBody({
@@ -45,8 +18,8 @@ class WeeklyScheduleBody extends StatelessWidget {
     'Sun',
   ];
 
-  final List<ScheduleEvent> events;
-
+  final List<EventModel> events;
+// Creates the white background of the weekly structure, generates it based on length of days
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -75,7 +48,7 @@ class WeeklyScheduleBody extends StatelessWidget {
 class _DayColumn extends StatelessWidget {
   final String day;
   final bool isLast;
-  final List<ScheduleEvent> events;
+  final List<EventModel> events;
 
   const _DayColumn({
     required this.day,
@@ -95,6 +68,7 @@ class _DayColumn extends StatelessWidget {
 
     final heightPerHour = usableHeight / 24.0;
 
+    // This column is responsible for the headings above the rows (of the day name)
     return Column(
       children: [
         Padding(
@@ -126,66 +100,18 @@ class _DayColumn extends StatelessWidget {
                 right: isLast
                     ? BorderSide.none
                     : BorderSide(
-                        color: Colors.black.withValues(alpha: 0.5),
+                        color: Colors.black.withOpacity(0.5),
                         width: 1,
                       ),
               ),
             ),
             child: Stack(
-              children: events.map((event) {
-                final start =
-                    timeToDouble(event.startTime);
-                final end =
-                    timeToDouble(event.endTime);
-                final duration = end - start;
-                return Stack(
-                  children: [Positioned(
-                  top: start * heightPerHour,
-                  left: 4,
-                  right: 4,
-                  child: GestureDetector(onTap: ()  {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Personal Time" ),
-          content: Text("${event.startTime.format(context)} - "
-                        "${event.endTime.format(context)}",),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Closes the dialog
-              },
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  },
-                   child: Container(
-                    height: duration * heightPerHour,
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: Text("Personal Time "
-                        "${event.startTime.format(context)} - "
-                        "${event.endTime.format(context)}",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  )
-                  )
-                  ]
-                );
-              }).toList(),
+              children: events
+                  .map((event) => EventWidget(
+                        model: event,
+                        heightPerHour: heightPerHour,
+                      ))
+                  .toList(),
             ),
           ),
         ),
@@ -194,37 +120,33 @@ class _DayColumn extends StatelessWidget {
   }
 }
 
-double timeToDouble(TimeOfDay myTime) {
-  return myTime.hour + (myTime.minute / 60.0);
-}
-
-/// Redundant, replaced by ScheduleEvent, not removed for backup purposes
+/// Redundant, replaced by EventModel, not removed for backup purposes
 class ScheduleBlock {
   final String day;
   final TimeOfDay startTime;
   final TimeOfDay endTime;
 
-  ScheduleBlock({
+  const ScheduleBlock({
     required this.day,
     required this.startTime,
     required this.endTime,
   });
 }
 
-Future<ScheduleEvent?> _showAddSchedule(
-    BuildContext context) async {
+Future<EventModel?> _showAddSchedule(
+    BuildContext context, int currentStep) async {
   TimeOfDay startTime = TimeOfDay.now();
   TimeOfDay endTime = TimeOfDay.now();
   String? selectedDay = 'Mon';
 
-  return await showDialog<ScheduleEvent>(
+  return await showDialog<EventModel>(
     context: context,
     builder: (BuildContext context) {
       return StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            title: const Text(
-              'Add Personal Time',
+            title: Text(
+              "Add ${eventTypes[currentStep].name}",
               textAlign: TextAlign.center,
             ),
             content: Column(
@@ -290,9 +212,9 @@ Future<ScheduleEvent?> _showAddSchedule(
                 onPressed: () {
                   Navigator.pop(
                     context,
-                    ScheduleEvent(
+                    EventModel(
                       id: 'Sample',
-                      eventType: 'Personal Time (Sampel)',
+                      eventType: eventTypes[currentStep].name,
                       day: selectedDay!,
                       startTime: startTime,
                       endTime: endTime,
@@ -320,7 +242,8 @@ class ScheduleHomePage extends StatefulWidget {
 class _ScheduleHomePageState
     extends State<ScheduleHomePage> {
 
-  final List<ScheduleEvent> events = [];
+  int _stepTracker = 0;
+  final List<EventModel> events = [];
 
   @override
   Widget build(BuildContext context) {
@@ -484,8 +407,7 @@ class _ScheduleHomePageState
           heroTag: "btn2",
           onPressed: () async {
 
-            final newEvent =
-                await _showAddSchedule(context);
+            final newEvent = await _showAddSchedule(context, _stepTracker);
 
             if (newEvent != null) {
               setState(() {
@@ -503,7 +425,11 @@ class _ScheduleHomePageState
 
         FloatingActionButton(
           heroTag: "btn3",
-          onPressed: () {},
+          onPressed: () {
+            if (_stepTracker < eventTypes.length - 1) {
+              setState(() => _stepTracker++);
+            }
+          },
           foregroundColor: Colors.black,
           backgroundColor: Colors.red,
           shape: const CircleBorder(),
@@ -512,6 +438,4 @@ class _ScheduleHomePageState
       ],
     );
   }
-
-   
 }
