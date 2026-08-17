@@ -6,6 +6,7 @@ class EventWidget extends StatelessWidget {
     super.key,
     required this.model,
     required this.heightPerHour,
+  });
 
   final EventModel model; //The data model for this widget
   final double heightPerHour; //The calculated height this widget will be so it is proportional to the height of the day.

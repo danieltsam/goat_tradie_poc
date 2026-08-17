@@ -146,7 +146,7 @@ Future<EventModel?> _showAddSchedule(
         builder: (context, setState) {
           return AlertDialog(
             title: Text(
-              "Add ${eventTypes[currentStep].name}",
+              "Add ${eventTypes[currentStep].name} Time",
               textAlign: TextAlign.center,
             ),
             content: Column(
@@ -333,6 +333,9 @@ class _ScheduleHomePageState
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
+                  child: Center(child: Text('Step ${_stepTracker+1} of 12',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)))
                 ),
               ),
 

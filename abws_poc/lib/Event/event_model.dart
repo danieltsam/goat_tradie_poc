@@ -17,11 +17,11 @@ class EventType {
 /// This list defines the order of steps for the user's weekly structure setup.
 const List<EventType> eventTypes = [
   EventType('Health', Color(0xFF8A9A86)), // Earthy Green
-  EventType('Friends Time', Color(0xFFB5A1E2)), // Lavender
+  EventType('Friends', Color(0xFFB5A1E2)), // Lavender
   EventType('Spiritual', Color(0xFF5C5292)), // Medium Violet/ Indigo
   EventType('Cultural', Color(0xFFFFB347)), // Awakening Gold
-  EventType('Family Time', Color(0xFFF3A78D)), // Come together Warm Peach
-  EventType('Personal Time', Color(0xFF2C7A7B)), // Connection Teal
+  EventType('Family', Color(0xFFF3A78D)), // Come together Warm Peach
+  EventType('Personal', Color(0xFF2C7A7B)), // Connection Teal
   EventType('Community', Color(0xFF007AFF)), // Bright blue
   EventType('Travel', Color(0xFFFFD166)), // Yellow
   EventType('Admin', Color(0xFF8E8E93)), // Mid Grey
