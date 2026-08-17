@@ -22,6 +22,66 @@ class EventWidget extends StatelessWidget {
       top: start * heightPerHour,
       left: 4,
       right: 4,
+      child: GestureDetector(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Event Details'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Day: ${model.day}',
+                    ),
+                    const SizedBox(height: 8),
+
+                    Text(
+                      'Activity Type: ${model.eventType}',
+                    ),
+                    const SizedBox(height: 8),
+
+                    Text(
+                      'Start Time: ${model.startTime.format(context)}', // Want to make this a time picker, so can change time
+                    ),
+                    const SizedBox(height: 8),
+
+                    Text(
+                      'End Time: ${model.endTime.format(context)}', // Want to make this a time picker, so can change time
+                    ),
+                    const SizedBox(height: 8),
+
+                    Text(
+                      'Duration: ${duration.toStringAsFixed(1)} hours',
+                    ),
+                  ],
+                ),
+
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Close'),
+                  ),
+
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      // Add delete functionality here
+                    },
+                    child: const Text(
+                      'Delete',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        },
         
       child: Container(
         height: duration * heightPerHour,
@@ -39,6 +99,7 @@ class EventWidget extends StatelessWidget {
         ),
         
       ),
+      )
     );
   }
 }

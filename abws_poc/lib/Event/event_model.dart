@@ -16,18 +16,18 @@ class EventType {
 /// 
 /// This list defines the order of steps for the user's weekly structure setup.
 const List<EventType> eventTypes = [
-  EventType('Health', Color(0xFF0BC42A)),
-  EventType('Friends Time', Color(0xFFCE2127)),
-  EventType('Spiritual', Color(0xABCEED00)),
-  EventType('Cultural', Color(0xC0C0C0C0)),
-  EventType('Family Time', Color(0xA1C1E3EE)),
-  EventType('Personal Time', Color(0xFF5E35B1)), // Placeholder
-  EventType('Community', Color(0xFFFDD835)), // Placeholder
-  EventType('Travel', Color(0xFFFB8C00)), // Placeholder
-  EventType('Admin', Color(0xFF43A047)), // Placeholder
-  EventType('Marketing', Color(0xFF1E88E5)), // Placeholder
-  EventType('Financial', Color(0xFF8E24AA)), // Placeholder
-  EventType('On the Tools', Color(0xFFD81B60)), // Placeholder
+  EventType('Health', Color(0xFF8A9A86)), // Earthy Green
+  EventType('Friends Time', Color(0xFFB5A1E2)), // Lavender
+  EventType('Spiritual', Color(0xFF5C5292)), // Medium Violet/ Indigo
+  EventType('Cultural', Color(0xFFFFB347)), // Awakening Gold
+  EventType('Family Time', Color(0xFFF3A78D)), // Come together Warm Peach
+  EventType('Personal Time', Color(0xFF2C7A7B)), // Connection Teal
+  EventType('Community', Color(0xFF007AFF)), // Bright blue
+  EventType('Travel', Color(0xFFFFD166)), // Yellow
+  EventType('Admin', Color(0xFF8E8E93)), // Mid Grey
+  EventType('Marketing', Color(0xFFFF7A00)), // Orange
+  EventType('Financial', Color(0xFF2E7D32)),  // Green
+  EventType('On the Tools', Color(0xFF4A6572)), // Steel blue / charcoal
 ];
 
 /// A utility function to find and return the [EventType] details for a given
