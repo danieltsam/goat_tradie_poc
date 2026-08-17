@@ -28,144 +28,179 @@ class EventWidget extends StatelessWidget {
           showDialog(
             context: context,
             builder: (context) {
-              return AlertDialog(
-                title: const Text('Event Details'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Day: ${model.day}',
-                    ),
-                    const SizedBox(height: 8),
+              return StatefulBuilder(
+                builder: (context, setState) {
+                  // Recalculate duration whenever the times change
+                  final updatedStart = timeToDouble(model.startTime);
+                  final updatedEnd = timeToDouble(model.endTime);
+                  final updatedDuration = updatedEnd - updatedStart;
 
-                    Text(
-                      'Activity Type: ${model.eventType}',
-                    ),
-                    const SizedBox(height: 8),
-
-                    //Start Time
-                    InkWell(
-                      onTap: () async {
-                        final TimeOfDay? newStartTime =
-                            await showTimePicker(
-                          context: context,
-                          initialTime: model.startTime,
-                        );
-                        // Currently doesn't let you edit the time, using SetState() I think it will automatically update the duration / height
-                      },
-
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8,
+                  return AlertDialog(
+                    title: const Text('Event Details'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Day: ${model.day}',
                         ),
 
-                        child: Row(
-                          children: [
-                            const Text(
-                              'Start Time: ',
-                              style: TextStyle(fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                        const SizedBox(height: 8),
 
-                            Text(
-                              model.startTime.format(context),
-                              style: const TextStyle(decoration: TextDecoration.underline,
-                              ),
-                            ),
+                        Text(
+                          'Activity Type: ${model.eventType}',
+                        ),
 
-                            const SizedBox(width: 8),
-                            const Icon(Icons.access_time, size: 18,
+                        const SizedBox(height: 8),
+
+                        // Start Time
+                        InkWell(
+                          onTap: () async {
+                            final TimeOfDay? picked =
+                                await showTimePicker(
+                              context: context,
+                              initialTime: model.startTime,
+                            );
+
+                            if (picked != null) {
+                              setState(() {
+                                model.startTime = picked;
+                              });
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
                             ),
-                          ],
+                            child: Row(
+                              children: [
+                                const Text(
+                                  'Start Time: ',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+
+                                Text(
+                                  model.startTime.format(context),
+                                  style: const TextStyle(
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+
+                                const SizedBox(width: 8),
+
+                                const Icon(
+                                  Icons.access_time,
+                                  size: 18,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // End Time
+                        InkWell(
+                          onTap: () async {
+                            final TimeOfDay? picked =
+                                await showTimePicker(
+                              context: context,
+                              initialTime: model.endTime,
+                            );
+
+                            if (picked != null) {
+                              setState(() {
+                                model.endTime = picked;
+                              });
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                            ),
+                            child: Row(
+                              children: [
+                                const Text(
+                                  'End Time: ',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+
+                                Text(
+                                  model.endTime.format(context),
+                                  style: const TextStyle(
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+
+                                const SizedBox(width: 8),
+
+                                const Icon(
+                                  Icons.access_time,
+                                  size: 18,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        Text(
+                          'Duration: ${updatedDuration.toStringAsFixed(1)} hours',
+                        ),
+                      ],
+                    ),
+
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Close'),
+                      ),
+
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+
+                          // Add delete functionality here
+                        },
+                        child: const Text(
+                          'Delete',
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
                         ),
                       ),
-                    ),
-
-                    // End Time
-                     InkWell(
-                      onTap: () async {
-                        final TimeOfDay? newEndTime =
-                            await showTimePicker(
-                          context: context,
-                          initialTime: model.endTime,
-                        );
-                      // Currently doesn't let you edit the time, using SetState() I think it will automatically update the duration / height
-                      },
-
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric( vertical: 8,
-                        ),
-
-                        child: Row(
-                          children: [
-                            const Text(
-                              'End Time: ',
-                              style: TextStyle( fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            Text(
-                              model.endTime.format(context),
-                              style: const TextStyle(decoration: TextDecoration.underline,
-                              ),
-                            ),
-
-                            const SizedBox(width: 8),
-                            const Icon(Icons.access_time, size: 18,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    Text(
-                      'Duration: ${duration.toStringAsFixed(1)} hours',
-                    ),
-                  ],
-                ),
-
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Close'),
-                  ),
-
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      // Add delete functionality here
-                    },
-                    child: const Text(
-                      'Delete',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                ],
+                    ],
+                  );
+                },
               );
             },
           );
         },
-        
-      child: Container(
-        height: duration * heightPerHour,
-        decoration: BoxDecoration(
-          color: model.color, // Uses the color from the EventModel object
-          borderRadius: BorderRadius.circular(8),
-        ),
-        
-        child: Center(
-          child: Text(
-            "${model.eventType} ${model.startTime.format(context)} - ${model.endTime.format(context)}",
-            style: const TextStyle(color: Colors.white, fontSize: 12),
-            textAlign: TextAlign.center,
+
+        // This Container is the child of GestureDetector
+        child: Container(
+          height: duration * heightPerHour,
+          decoration: BoxDecoration(
+            color: model.color,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Center(
+            child: Text(
+              '${model.eventType} '
+              '${model.startTime.format(context)} - '
+              '${model.endTime.format(context)}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
-        
       ),
-      )
     );
   }
 }
