@@ -388,7 +388,7 @@ class _ScheduleHomePageState
       ),
     );
   }
-
+  // Question mark button, responsible for the info section of the ABWS
   Widget floatingActionButton(
       BuildContext context) {
     return Row(
@@ -425,6 +425,7 @@ class _ScheduleHomePageState
 
         const SizedBox(width: 10),
 
+// 'Plus' button, for adding things to the schedule
         FloatingActionButton(
           heroTag: "btn2",
           onPressed: () async {
@@ -445,6 +446,7 @@ class _ScheduleHomePageState
 
         const SizedBox(width: 10),
 
+        // Arrow / Next button, for changing categories, currently unimplemented but will need a pop up each time, talking about the new category / event type and referencing their recommended hours from the questionnaire
         FloatingActionButton(
           heroTag: "btn3",
           onPressed: () {
