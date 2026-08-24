@@ -34,6 +34,8 @@ class EventWidget extends StatelessWidget {
                   final updatedStart = timeToDouble(model.startTime);
                   final updatedEnd = timeToDouble(model.endTime);
                   final updatedDuration = updatedEnd - updatedStart;
+                  final updatedMinutes = model.endTime.minute - model.startTime.minute; // Calculated minutes of given, used for display
+                  final updatedHours = model.endTime.hour - model.startTime.hour; // Calculated hours of given time, used for display
 
                   return AlertDialog(
                     title: const Text('Event Details'),
@@ -144,9 +146,10 @@ class EventWidget extends StatelessWidget {
                             ),
                           ),
                         ),
-
                         Text(
-                          'Duration: ${updatedDuration.toStringAsFixed(1)} hours',
+                              updatedMinutes == 0
+                              ? 'Duration: $updatedHours ${updatedHours == 1 ? 'hour' : 'hours'}'
+                              : 'Duration: $updatedHours ${updatedHours == 1 ? 'hour' : 'hours'}, $updatedMinutes ${updatedMinutes == 1 ? 'minute' : 'minutes'}',
                         ),
                       ],
                     ),

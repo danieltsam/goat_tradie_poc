@@ -388,13 +388,14 @@ class _ScheduleHomePageState
       ),
     );
   }
-  // Question mark button, responsible for the info section of the ABWS
+  
   Widget floatingActionButton(
       BuildContext context) {
     return Row(
       mainAxisAlignment:
           MainAxisAlignment.spaceEvenly,
       children: [
+        // Question mark button, responsible for the info section of the ABWS
         FloatingActionButton(
           heroTag: "btn1",
           onPressed: () {
