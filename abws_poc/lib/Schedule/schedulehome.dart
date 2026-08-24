@@ -134,7 +134,7 @@ class ScheduleBlock {
 }
 
 Future<EventModel?> _showAddSchedule(
-    BuildContext context, int currentStep) async {
+    BuildContext context, int currentStep, List<EventModel> events) async {
   TimeOfDay startTime = TimeOfDay.now();
   TimeOfDay endTime = TimeOfDay.now();
   String? selectedDay = 'Mon';
@@ -144,6 +144,12 @@ Future<EventModel?> _showAddSchedule(
     builder: (BuildContext context) {
       return StatefulBuilder(
         builder: (context, setState) {
+          
+          // Function used to compare for overlaps and start/endtime correct
+          int timetoMinutes(TimeOfDay time){
+            return time.hour * 60 + time.minute;
+          }
+
           return AlertDialog(
             title: Text(
               "Add ${eventTypes[currentStep].name} Time",
@@ -210,6 +216,52 @@ Future<EventModel?> _showAddSchedule(
 
               ElevatedButton(
                 onPressed: () {
+                  final newStart = timetoMinutes(startTime);
+                  final newEnd = timetoMinutes(endTime);
+
+                  // (1) First check
+                  // Checking start earlier than end
+                  if (newStart >= newEnd){
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Start time must be earlier than end time.'
+                      ),
+                      ),
+                    );
+                    return;
+                  }
+
+                  //(2) Second check
+                  // Overlap
+                  final hasOverlap = events.any((event) {
+                    // Only compare events on the same day
+                    if (event.day != selectedDay) {
+                      return false;
+                    }
+
+                    final existingStart =
+                        timetoMinutes(event.startTime);
+
+                    final existingEnd =
+                        timetoMinutes(event.endTime);
+
+                    // For overlap
+                    // newStart < existingEnd
+                    // AND
+                    // newEnd > existingStart
+                    return newStart < existingEnd &&
+                        newEnd > existingStart;
+                  });
+
+                  if (hasOverlap)
+                  {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('This activity overlaps with another one.'
+                      ),
+                      ),
+                    );
+                    return;
+                  }
+
                   Navigator.pop(
                     context,
                     EventModel(
@@ -431,7 +483,7 @@ class _ScheduleHomePageState
           heroTag: "btn2",
           onPressed: () async {
 
-            final newEvent = await _showAddSchedule(context, _stepTracker);
+            final newEvent = await _showAddSchedule(context, _stepTracker, events);
 
             if (newEvent != null) {
               setState(() {
