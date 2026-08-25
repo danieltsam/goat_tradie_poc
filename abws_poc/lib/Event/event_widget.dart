@@ -1,6 +1,17 @@
 import 'package:abws_poc/Event/event_model.dart';
 import 'package:flutter/material.dart';
 
+
+// Used for the display of text in the event blocks, handles cutting off 0s when they are :00
+String formatEventTime(BuildContext context, TimeOfDay time) {
+  if (time.minute == 0) {
+    final formatted = time.format(context);
+    return formatted.replaceAll(':00', '');
+  }
+
+  return time.format(context);
+}
+
 class EventWidget extends StatelessWidget {
   const EventWidget({
     super.key,
@@ -192,14 +203,15 @@ class EventWidget extends StatelessWidget {
           ),
           child: Center(
             child: Text(
-              '${model.eventType} '
-              '${model.startTime.format(context)} - '
-              '${model.endTime.format(context)}',
+              '${model.eventType} \n'
+              '${formatEventTime(context, model.startTime)}\n'
+              '${formatEventTime(context, model.endTime)}',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 12,
               ),
               textAlign: TextAlign.center,
+              overflow: TextOverflow.clip // Not really sure if this actually handles overflow, can't see any visual change
             ),
           ),
         ),
