@@ -211,7 +211,7 @@ class EventWidget extends StatelessWidget {
                 fontSize: 12,
               ),
               textAlign: TextAlign.center,
-              overflow: TextOverflow.fade // Not really sure if this actually handles overflow, can't see any visual change
+              overflow: TextOverflow.fade // Happy to change it, not sure what other options would look better
             ),
           ),
         ),

@@ -77,10 +77,10 @@ class _DayColumn extends StatelessWidget {
             vertical: 8,
           ),
           child: Container(
-            height: 32,
+            height: 24,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: Colors.grey,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
@@ -320,7 +320,7 @@ class _ScheduleHomePageState
     return AppBar(
       title: const Text(
         'A Better Weekly Structure',
-        style: TextStyle(color: Colors.black, fontSize: 18, fontFamily: 'HighVoltage'),
+        style: TextStyle(color: Colors.black, fontSize: 24, fontFamily: 'HighVoltage'),
       ),
       backgroundColor: Colors.red,
       elevation: 0.0,
@@ -385,7 +385,7 @@ class _ScheduleHomePageState
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
-                  child: Center(child: Text('Step ${_stepTracker+1} of 12',
+                  child: Center(child: Text('Step \n${_stepTracker+1} of 12',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)))
                 ),
