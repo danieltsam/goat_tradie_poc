@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../Schedule/schedulehome.dart';
+import '../Schedule/schedule_widget.dart';
 
 class Question {
   final String text;

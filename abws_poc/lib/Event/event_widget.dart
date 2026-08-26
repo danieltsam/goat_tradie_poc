@@ -41,10 +41,6 @@ class EventWidget extends StatelessWidget {
             builder: (context) {
               return StatefulBuilder(
                 builder: (context, setState) {
-                  // Recalculate duration whenever the times change
-                  final updatedStart = timeToDouble(model.startTime);
-                  final updatedEnd = timeToDouble(model.endTime);
-                  final updatedDuration = updatedEnd - updatedStart;
                   final updatedMinutes = model.endTime.minute - model.startTime.minute; // Calculated minutes of given, used for display
                   final updatedHours = model.endTime.hour - model.startTime.hour; // Calculated hours of given time, used for display
 

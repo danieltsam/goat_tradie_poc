@@ -1,4 +1,4 @@
-import 'package:abws_poc/Schedule/schedulehome.dart';
+import 'package:abws_poc/Schedule/schedule_widget.dart';
 
 import 'package:flutter/material.dart';
 
