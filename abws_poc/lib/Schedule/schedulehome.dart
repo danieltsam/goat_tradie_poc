@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:abws_poc/Event/event_model.dart';
 import 'package:abws_poc/Event/event_widget.dart';
 
+
 class WeeklyScheduleBody extends StatelessWidget {
   const WeeklyScheduleBody({
     super.key,
@@ -19,31 +20,100 @@ class WeeklyScheduleBody extends StatelessWidget {
   ];
 
   final List<EventModel> events;
-// Creates the white background of the weekly structure, generates it based on length of days
+
+  // Change this value to adjust the space above 12AM
+  static const double timeBuffer = 32.0;
+
   @override
   Widget build(BuildContext context) {
+        final mediaQuery = MediaQuery.of(context); // Shorthand saves from writing whole thing
+
+    final screenHeight = mediaQuery.size.height;
+    final paddingTop = mediaQuery.padding.top;
+    final appBarHeight = kToolbarHeight;
+
+    final usableHeight = screenHeight - paddingTop - appBarHeight - 140;
+
+    final heightPerHour = usableHeight / 24.0;
     return Expanded(
       child: Container(
         color: Colors.white,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: List.generate(
-            days.length,
-            (index) => Expanded(
-              child: _DayColumn(
-                day: days[index],
-                isLast: index == days.length - 1,
-                events: events
-                    .where((event) => event.day == days[index])
-                    .toList(),
+          children: [
+            // Time column
+            SizedBox(
+              width: 55,
+              child: Column(
+                children: [
+                  // Buffer above 12AM
+                  SizedBox(height: timeBuffer),
+
+                  // Time labels
+                  ...List.generate(
+                    24,
+                    (index) {
+                      final hour = index;
+
+                      String timeLabel;
+
+                      if (hour == 0) {
+                        timeLabel = '12AM';
+                      } else if (hour < 12) {
+                        timeLabel = '${hour}AM';
+                      } else if (hour == 12) {
+                        timeLabel = '12PM';
+                      } else {
+                        timeLabel = '${hour - 12}PM';
+                      }
+
+                      return SizedBox(
+                        height: heightPerHour,
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Text(
+                            timeLabel,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
-          ),
+
+            // Day columns
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List.generate(
+                  days.length,
+                  (index) => Expanded(
+                    child: _DayColumn(
+                      day: days[index],
+                      isLast: index == days.length - 1,
+                      events: events
+                          .where((event) => event.day == days[index])
+                          .toList(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
+
+
+
 
 class _DayColumn extends StatelessWidget {
   final String day;
