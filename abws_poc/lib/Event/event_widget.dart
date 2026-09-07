@@ -203,7 +203,7 @@ class EventWidget extends StatelessWidget {
           ),
           child: Center(
             child: Text(
-              '${model.eventType} \n'
+              '${model.shortType} \n'
               '${formatEventTime(context, model.startTime)}\n'
               '${formatEventTime(context, model.endTime)}',
               style: const TextStyle(

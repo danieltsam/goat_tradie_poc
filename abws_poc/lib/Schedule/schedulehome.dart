@@ -337,6 +337,7 @@ Future<EventModel?> _showAddSchedule(
                     EventModel(
                       id: 'Sample',
                       eventType: eventTypes[currentStep].name,
+                      shortType: eventTypes[currentStep].shortName,
                       day: selectedDay!,
                       startTime: startTime,
                       endTime: endTime,
