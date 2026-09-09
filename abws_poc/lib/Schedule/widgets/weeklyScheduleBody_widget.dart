@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:abws_poc/Event/event_model.dart';
 import 'package:abws_poc/Event/event_widget.dart';
-import 'package:abws_poc/Schedule/schedule_model.dart';
 
 class WeeklyScheduleBody extends StatelessWidget {
   const WeeklyScheduleBody({
     super.key,
     required this.events,
   });
+
+  static const List<String> days = [
+    'Mon',
+    'Tues',
+    'Wed',
+    'Thur',
+    'Fri',
+    'Sat',
+    'Sun',
+  ];
 
   final List<EventModel> events;
 
@@ -20,12 +29,14 @@ class WeeklyScheduleBody extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: List.generate(
-            scheduleDays.length,
+            days.length,
             (index) => Expanded(
               child: DayColumnWidget(
-                day: scheduleDays[index],
-                isLast: index == scheduleDays.length - 1,
-                events: getEventsForDay(events, scheduleDays[index]),
+                day: days[index],
+                isLast: index == days.length - 1,
+                events: events
+                    .where((event) => event.day == days[index])
+                    .toList(),
               ),
             ),
           ),
