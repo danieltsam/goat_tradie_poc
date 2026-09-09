@@ -1,15 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:abws_poc/Event/event_model.dart';
-
-const List<String> _days = [
-  'Mon',
-  'Tues',
-  'Wed',
-  'Thur',
-  'Fri',
-  'Sat',
-  'Sun',
-];
+import 'package:abws_poc/Schedule/schedule_model.dart';
 
 /// Opens the modal dialog for adding an event to the schedule.
 Future<EventModel?> showAddScheduleDialog(
@@ -26,10 +17,6 @@ Future<EventModel?> showAddScheduleDialog(
     builder: (BuildContext context) {
       return StatefulBuilder(
         builder: (context, setState) {
-          int timetoMinutes(TimeOfDay time) {
-            return time.hour * 60 + time.minute;
-          }
-
           return AlertDialog(
             title: Text(
               "Add ${eventTypes[currentStep].name} Time",
@@ -73,7 +60,7 @@ Future<EventModel?> showAddScheduleDialog(
                 DropdownButton<String>(
                   value: selectedDay,
                   isExpanded: true,
-                  items: _days.map((String value) {
+                  items: scheduleDays.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -92,11 +79,8 @@ Future<EventModel?> showAddScheduleDialog(
               ),
               ElevatedButton(
                 onPressed: () {
-                  final newStart = timetoMinutes(startTime);
-                  final newEnd = timetoMinutes(endTime);
-
-                  // (1) First check: start time earlier than end time
-                  if (newStart >= newEnd) {
+                  // 1. Check start earlier than end
+                  if (!isStartBeforeEnd(startTime, endTime)) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Start time must be earlier than end time.'),
@@ -105,19 +89,13 @@ Future<EventModel?> showAddScheduleDialog(
                     return;
                   }
 
-                  // (2) Second check: overlap
-                  final hasOverlap = events.any((event) {
-                    if (event.day != selectedDay) {
-                      return false;
-                    }
-
-                    final existingStart = timetoMinutes(event.startTime);
-                    final existingEnd = timetoMinutes(event.endTime);
-
-                    return newStart < existingEnd && newEnd > existingStart;
-                  });
-
-                  if (hasOverlap) {
+                  // 2. Check collision / overlap
+                  if (checkEventOverlap(
+                    events: events,
+                    day: selectedDay!,
+                    startTime: startTime,
+                    endTime: endTime,
+                  )) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('This activity overlaps with another one.'),
