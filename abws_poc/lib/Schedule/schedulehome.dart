@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:abws_poc/Event/event_model.dart';
 import 'package:abws_poc/Event/event_widget.dart';
 
+
 class WeeklyScheduleBody extends StatelessWidget {
   const WeeklyScheduleBody({
     super.key,
@@ -19,31 +20,100 @@ class WeeklyScheduleBody extends StatelessWidget {
   ];
 
   final List<EventModel> events;
-// Creates the white background of the weekly structure, generates it based on length of days
+
+  // Change this value to adjust the space above 12AM
+  static const double timeBuffer = 32.0;
+
   @override
   Widget build(BuildContext context) {
+        final mediaQuery = MediaQuery.of(context); // Shorthand saves from writing whole thing
+
+    final screenHeight = mediaQuery.size.height;
+    final paddingTop = mediaQuery.padding.top;
+    final appBarHeight = kToolbarHeight;
+
+    final usableHeight = screenHeight - paddingTop - appBarHeight - 140;
+
+    final heightPerHour = usableHeight / 24.0;
     return Expanded(
       child: Container(
         color: Colors.white,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: List.generate(
-            days.length,
-            (index) => Expanded(
-              child: _DayColumn(
-                day: days[index],
-                isLast: index == days.length - 1,
-                events: events
-                    .where((event) => event.day == days[index])
-                    .toList(),
+          children: [
+            // Time column
+            SizedBox(
+              width: 55,
+              child: Column(
+                children: [
+                  // Buffer above 12AM
+                  SizedBox(height: timeBuffer),
+
+                  // Time labels
+                  ...List.generate(
+                    24,
+                    (index) {
+                      final hour = index;
+
+                      String timeLabel;
+
+                      if (hour == 0) {
+                        timeLabel = '12AM';
+                      } else if (hour < 12) {
+                        timeLabel = '${hour}AM';
+                      } else if (hour == 12) {
+                        timeLabel = '12PM';
+                      } else {
+                        timeLabel = '${hour - 12}PM';
+                      }
+
+                      return SizedBox(
+                        height: heightPerHour,
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Text(
+                            timeLabel,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
-          ),
+
+            // Day columns
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List.generate(
+                  days.length,
+                  (index) => Expanded(
+                    child: _DayColumn(
+                      day: days[index],
+                      isLast: index == days.length - 1,
+                      events: events
+                          .where((event) => event.day == days[index])
+                          .toList(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
+
+
+
 
 class _DayColumn extends StatelessWidget {
   final String day;
@@ -77,10 +147,10 @@ class _DayColumn extends StatelessWidget {
             vertical: 8,
           ),
           child: Container(
-            height: 32,
+            height: 24,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: Colors.grey,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
@@ -134,7 +204,7 @@ class ScheduleBlock {
 }
 
 Future<EventModel?> _showAddSchedule(
-    BuildContext context, int currentStep) async {
+    BuildContext context, int currentStep, List<EventModel> events) async {
   TimeOfDay startTime = TimeOfDay.now();
   TimeOfDay endTime = TimeOfDay.now();
   String? selectedDay = 'Mon';
@@ -144,9 +214,15 @@ Future<EventModel?> _showAddSchedule(
     builder: (BuildContext context) {
       return StatefulBuilder(
         builder: (context, setState) {
+          
+          // Function used to compare for overlaps and start/endtime correct
+          int timetoMinutes(TimeOfDay time){
+            return time.hour * 60 + time.minute;
+          }
+
           return AlertDialog(
             title: Text(
-              "Add ${eventTypes[currentStep].name}",
+              "Add ${eventTypes[currentStep].name} Time",
               textAlign: TextAlign.center,
             ),
             content: Column(
@@ -210,11 +286,58 @@ Future<EventModel?> _showAddSchedule(
 
               ElevatedButton(
                 onPressed: () {
+                  final newStart = timetoMinutes(startTime);
+                  final newEnd = timetoMinutes(endTime);
+
+                  // (1) First check
+                  // Checking start earlier than end
+                  if (newStart >= newEnd){
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Start time must be earlier than end time.'
+                      ),
+                      ),
+                    );
+                    return;
+                  }
+
+                  //(2) Second check
+                  // Overlap
+                  final hasOverlap = events.any((event) {
+                    // Only compare events on the same day
+                    if (event.day != selectedDay) {
+                      return false;
+                    }
+
+                    final existingStart =
+                        timetoMinutes(event.startTime);
+
+                    final existingEnd =
+                        timetoMinutes(event.endTime);
+
+                    // For overlap
+                    // newStart < existingEnd
+                    // AND
+                    // newEnd > existingStart
+                    return newStart < existingEnd &&
+                        newEnd > existingStart;
+                  });
+
+                  if (hasOverlap)
+                  {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('This activity overlaps with another one.'
+                      ),
+                      ),
+                    );
+                    return;
+                  }
+
                   Navigator.pop(
                     context,
                     EventModel(
                       id: 'Sample',
                       eventType: eventTypes[currentStep].name,
+                      shortType: eventTypes[currentStep].shortName,
                       day: selectedDay!,
                       startTime: startTime,
                       endTime: endTime,
@@ -268,7 +391,7 @@ class _ScheduleHomePageState
     return AppBar(
       title: const Text(
         'A Better Weekly Structure',
-        style: TextStyle(color: Colors.black, fontSize: 18, fontFamily: 'HighVoltage'),
+        style: TextStyle(color: Colors.black, fontSize: 24, fontFamily: 'HighVoltage'),
       ),
       backgroundColor: Colors.red,
       elevation: 0.0,
@@ -333,6 +456,9 @@ class _ScheduleHomePageState
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
+                  child: Center(child: Text('Step \n${_stepTracker+1} of 12',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)))
                 ),
               ),
 
@@ -385,16 +511,36 @@ class _ScheduleHomePageState
       ),
     );
   }
-
+  
   Widget floatingActionButton(
       BuildContext context) {
     return Row(
       mainAxisAlignment:
           MainAxisAlignment.spaceEvenly,
       children: [
+        // Question mark button, responsible for the info section of the ABWS
         FloatingActionButton(
           heroTag: "btn1",
-          onPressed: () {},
+          onPressed: () {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Information'),
+            content: const Text('Placeholder'), // Include, What is ABWS, How to use, and why can't I put work first?
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Perform your action here
+                  Navigator.pop(context);
+                },
+                child: const Text('Cancel'),
+              ),
+            ],
+          );
+        },
+      );
+    },
           foregroundColor: Colors.black,
           backgroundColor: Colors.red,
           shape: const CircleBorder(),
@@ -403,11 +549,12 @@ class _ScheduleHomePageState
 
         const SizedBox(width: 10),
 
+// 'Plus' button, for adding things to the schedule
         FloatingActionButton(
           heroTag: "btn2",
           onPressed: () async {
 
-            final newEvent = await _showAddSchedule(context, _stepTracker);
+            final newEvent = await _showAddSchedule(context, _stepTracker, events);
 
             if (newEvent != null) {
               setState(() {
@@ -423,6 +570,7 @@ class _ScheduleHomePageState
 
         const SizedBox(width: 10),
 
+        // Arrow / Next button, for changing categories, currently unimplemented but will need a pop up each time, talking about the new category / event type and referencing their recommended hours from the questionnaire
         FloatingActionButton(
           heroTag: "btn3",
           onPressed: () {
