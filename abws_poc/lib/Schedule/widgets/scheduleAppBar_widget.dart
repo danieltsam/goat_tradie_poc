@@ -22,7 +22,7 @@ class ScheduleAppBarWidget extends StatelessWidget implements PreferredSizeWidge
         'A Better Weekly Structure',
         style: TextStyle(
           color: Colors.black,
-          fontSize: 18,
+          fontSize: 26,
           fontFamily: 'HighVoltage',
         ),
       ),
@@ -84,7 +84,7 @@ class ScheduleAppBarWidget extends StatelessWidget implements PreferredSizeWidge
                   ),
                   child: Center(
                     child: Text(
-                      'Step ${stepTracker + 1} of 12',
+                      'Step \n${stepTracker + 1} of 12',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 18,
